@@ -22,4 +22,4 @@ class Category(models.Model):
         indexes = [models.Index(fields=["company", "name"])]
 
     def __str__(self):
-        return self.name
+        return self.name + " : " + str(self.id)
