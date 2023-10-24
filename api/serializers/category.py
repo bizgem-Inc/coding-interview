@@ -18,28 +18,32 @@ class ApiCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('id', 'company', 'name', 'parent_category', 'created_at', 'updated_at')
+
     def create(self, validated_data):
-        print(validated_data)
-        c = Company.objects.get(name=validated_data["company"]["name"])
-        if validated_data["parent_category"] is None:
-            p = None
+        company = Company.objects.get(name=validated_data["company"]["name"])
+        if 'parent_category' in validated_data:
+            if validated_data["parent_category"] is None:
+                parent_category = None
+            else:
+                parent_category = Category.objects.get(name=validated_data["parent_category"]["name"])
         else:
-            p = Category.objects.get(name=validated_data["parent_category"]["name"])
+            parent_category = None    
         return Category.objects.create(
             name = validated_data["name"],
-            company = c,
-            parent_category = p
+            company = company,
+            parent_category = parent_category
         )
 
     def update(self, instance, validated_data):
-        print(validated_data)
-        c = Company.objects.get(name=validated_data["company"]["name"])
+        company = Company.objects.get(name=validated_data["company"]["name"])
         instance.name = validated_data["name"]
-        instance.company = c
-
-        if 'parent_category' in validated_data and validated_data["parent_category"] is not None:
-            instance.parent_category = Category.objects.get(name=validated_data["parent_category"]["name"])
-        if validated_data["parent_category"] is None :
+        instance.company = company
+        if 'parent_category' in validated_data:
+            if validated_data["parent_category"] is not None:
+                instance.parent_category = Category.objects.get(name=validated_data["parent_category"]["name"])
+            else:
+                instance.parent_category = None
+        else:
             instance.parent_category = None
         instance.save()
         return instance
