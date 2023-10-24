@@ -1,0 +1,29 @@
+### create
+POST http://127.0.0.1:8000/api/category/create
+Content-Type: application/json
+
+{
+    "name": "category 1",
+    "company": {
+        "name": "company 1"
+    }
+}
+
+### get
+GET http://127.0.0.1:8000/api/category/get/685c118f-66cf-4375-9153-1b68c6f02f00
+
+### list
+GET http://127.0.0.1:8000/api/category/list
+
+### update
+PUT http://127.0.0.1:8000/api/category/update
+Content-Type: application/json
+
+{
+    "id": "685c118f-66cf-4375-9153-1b68c6f02f00",
+    "name": "category 2",
+    "company_name": "company 2"
+}
+
+### delete
+DELETE http://127.0.0.1:8000/api/category/delete/0d6b7be4-441b-493b-b910-ee186bd01334

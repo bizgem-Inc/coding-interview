@@ -14,7 +14,7 @@ SECRET_KEY = "django-insecure-m)88=k-q&^0(0gc=9l2m)=*^^mrme!^)sfv+o61p66z#=m8l)*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -28,6 +28,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "api",
+    "domain",
+    "infrastructure",
 ]
 
 MIDDLEWARE = [
@@ -66,11 +68,11 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.environ.get("POSTGRES_DB", "coding-test"),
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("POSTGRES_DB", "coding_test"),
         "USER": os.environ.get("POSTGRES_USER", "root"),
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "password"),
-        "HOST": os.environ.get("DB_HOST_NAME", "localhost"),
+        "HOST": os.environ.get("DB_HOST_NAME", "coding_interview_postgres"),
         "PORT": os.environ.get("DB_PORT", "5432"),
     }
 }

@@ -1,0 +1,29 @@
+services:
+  app:
+    tty: true
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      args:
+        sh_file_name: "start_local.sh"
+        poetry_install_command: "poetry install"
+    container_name: coding-interview-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    networks:
+      - default
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:13.3
+    ports:
+      - "5432:5432"
+    container_name: coding_interview_postgres
+    command: postgres -c log_destination=stderr -c log_statement=all -c log_connections=on -c log_disconnections=on
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=coding_test
