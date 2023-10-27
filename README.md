@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# coding-interview
-=======
 # coding-interview
 
 ## 元ソースに対する変更内容
@@ -30,4 +27,3 @@ settings.py の 'DATABASES' は変更していません。django-filte を追加
 |DELETE|/api/category/{id}/|個別削除|{id}で指定されたCategoryを削除|
 
 \* POST/PUT で parent_category を省略すると, parent_category が未設定(null)となります。ブラウザから利用する場合は、'HTML form' ではなく Raw data' を使って API を呼び出してください。
->>>>>>> upstream/master

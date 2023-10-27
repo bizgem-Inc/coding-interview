@@ -14,9 +14,6 @@ class Company(models.Model):
         db_table_comment = "企業テーブル"
         verbose_name = "company"
         verbose_name_plural = "companies"
-<<<<<<< HEAD
-=======
 
     def __str__(self):
         return self.name + " : " + str(self.id)
->>>>>>> upstream/master
