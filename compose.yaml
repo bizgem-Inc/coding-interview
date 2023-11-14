@@ -1,0 +1,45 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    env_file:
+      - ./local.env
+    networks:
+      - backend
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    container_name: django
+    build:
+      dockerfile: Dockerfile
+      target: development
+    command: >
+      bash -c '
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000
+      '
+    volumes:
+      - .:/app
+    env_file:
+      - ./local.env
+    networks:
+      - backend
+    ports:
+      - 8000:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  backend:
+    external: false
+
+volumes:
+  postgres-data:
