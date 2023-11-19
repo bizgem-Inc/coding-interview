@@ -7,8 +7,15 @@ name = "pypi"
 django = "*"
 djangorestframework = "*"
 psycopg2-binary = "*"
+djangorestframework-camel-case = "*"
 
 [dev-packages]
+coverage = "*"
+isort = "*"
+autopep8 = "*"
+flake8 = "*"
+drf-spectacular = "*"
+factory-boy = "*"
 
 [requires]
 python_version = "3.11"
