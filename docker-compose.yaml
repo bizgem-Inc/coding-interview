@@ -1,0 +1,17 @@
+version: '3'
+services:
+  postgres:
+    container_name: coding_test_postgres
+    build:
+      context: ./docker/postgres
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_DB: "coding-test"
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "password"
+      DB_HOST_NAME: "localhost"
+      DB_PORT: "5432"
