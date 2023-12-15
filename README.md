@@ -6,17 +6,18 @@ DBはpostgresをdockerで起動する前提です。
 % docker-compose up
 ```
 
-pipenvのコマンドを使い仮想環境の準備、ライブラリのインストールを行います
-```sh
-% pipenv shell
-```
+pipenvを使い仮想環境の準備、ライブラリのインストールを行います
 ```sh
 % pipenv sync
 ```
 
+```sh
+% pipenv shell
+```
+
 migrationの実行
 ```sh
-python3 manage.py migrate
+python manage.py migrate
 ```
 
 サーバ起動
