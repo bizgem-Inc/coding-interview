@@ -10,6 +10,7 @@ class Company(models.Model):
     updated_at = models.DateTimeField(auto_now=True, db_comment="更新日時")
 
     class Meta:
+        app_label = "api"
         db_table = "companies"
         db_table_comment = "企業テーブル"
         verbose_name = "company"

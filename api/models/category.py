@@ -14,6 +14,7 @@ class Category(models.Model):
     updated_at = models.DateTimeField(auto_now=True, editable=False, db_comment="更新日時")
 
     class Meta:
+        app_label = "api"
         db_table = "categories"
         db_table_comment = "カテゴリテーブル"
         verbose_name = "category"
