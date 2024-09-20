@@ -1,0 +1,18 @@
+[
+  {
+    "model": "api.company",
+    "fields": {
+      "name": "ALFA Company",
+      "created_at": "2020-01-01T12:34:56.789Z",
+      "updated_at": "2020-01-01T12:34:56.789Z"
+    }
+  },
+  {
+    "model": "api.company",
+    "fields": {
+      "name": "BRAVO Company",
+      "created_at": "2020-01-02T12:34:56.789Z",
+      "updated_at": "2020-01-02T12:34:56.789Z"
+    }
+  }
+]
