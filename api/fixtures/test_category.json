@@ -1,0 +1,24 @@
+[
+    {
+        "model": "api.category",
+        "pk": "58cb4f5a-bdbf-428b-ad06-ba11a351a0ad",
+        "fields": {
+            "company": "7e4629be-87a7-4125-a550-387d172983f2",
+            "name": "test category1",
+            "parent_category": "dd60efc7-f96f-4f2b-8c05-fec305a1d7a1",
+            "created_at": "2024-10-08T01:00:00.00Z",
+            "updated_at": "2024-10-08T01:00:00.000Z"
+        }
+    },
+    {
+        "model": "api.category",
+        "pk": "dd60efc7-f96f-4f2b-8c05-fec305a1d7a1",
+        "fields": {
+            "company": "7e4629be-87a7-4125-a550-387d172983f2",
+            "name": "test category2",
+            "parent_category": null,
+            "created_at": "2024-10-08T01:00:00.00Z",
+            "updated_at": "2024-10-08T01:00:00.000Z"
+        }
+    }
+]
