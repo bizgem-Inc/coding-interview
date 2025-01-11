@@ -34,6 +34,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "log_request_id.middleware.RequestIDMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -66,6 +67,67 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'request_id': {
+            '()': 'log_request_id.filters.RequestIDFilter'
+        },
+    },
+    'formatters': {
+        'standard': {
+            'format': "{levelname} {asctime} [process={process:d} thread={thread:d}] [場所:{module}.{funcName}:{lineno}] request_id={request_id} {message}",
+            'style': '{',
+        },
+        'django.server': {
+            '()': 'django.utils.log.ServerFormatter',
+            'format': '[{server_time}] {message}',
+            'style': '{',
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ["request_id"],
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard'
+        },
+        'django.server': {
+            'level': 'DEBUG',
+            'filters': ["request_id"],
+            'class': 'logging.StreamHandler',
+            'formatter': 'django.server',
+        },
+    },
+    'loggers': {
+        # 自分で追加したアプリケーション全般のログを拾うロガー
+        '': {
+            'handlers': ['console'],
+            # DJANGO_LOG_LEVEL は Django の仕組みではないですが、公式に書かれているのでそうしました。
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+        'django': {
+            'handlers': ['console'],
+            # DJANGO_LOG_LEVEL は Django の仕組みではないですが、公式に書かれているのでそうしました。
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    }
+}
+
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -92,4 +154,6 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # リクエストID の名前
-REQUEST_ID_RESPONSE_HEADER = "request-id"
+LOG_REQUEST_ID_HEADER = "HTTP_X_REQUEST_ID"
+# この設定がないと request_id をログ表示できません。
+GENERATE_REQUEST_ID_IF_NOT_IN_HEADER = True
