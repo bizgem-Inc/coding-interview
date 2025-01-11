@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "sakaida-coding-review"
+version = "0.0.1"
+description = "境田が Bigeへのために作課題です"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "sakaida_coding_review"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "5.0.0"
+djangorestframework = "3.15.2"
+psycopg2-binary = "^2.9.10"
+django-cors-headers = "^4.6.0"
+django-filter = "^24.3"
+mypy = "^1.14.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
