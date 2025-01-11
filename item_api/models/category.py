@@ -18,5 +18,5 @@ class Category(models.Model):
         db_table_comment = "カテゴリテーブル"
         verbose_name = "category"
         verbose_name_plural = "categories"
-        constraints = [models.UniqueConstraint(fields=["company.py", "name"], name="unique_company_category_combination")]
+        constraints = [models.UniqueConstraint(fields=["company", "name"], name="unique_company_category_combination")]
         indexes = [models.Index(fields=["company", "name"])]
