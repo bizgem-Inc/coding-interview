@@ -1,11 +1,12 @@
-from rest_framework import viewsets
-from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, UpdateAPIView
 
 from item_api.models import Company
-from item_api.serializers.company import CompanyCreateSerializer
+from item_api.serializers.company import CompanySerializer
+from item_api.views import BaseMasterMaintenanceViewSet, CustomPageNumberPagination
 
 
-class CompanyListCreateAPIView(CreateAPIView, ListAPIView):
+class CompanyViewSet(BaseMasterMaintenanceViewSet):
     queryset = Company.objects.all()
-    serializer_class = CompanyCreateSerializer
+    serializer_class = CompanySerializer
+    pagination_class = CustomPageNumberPagination
+
 

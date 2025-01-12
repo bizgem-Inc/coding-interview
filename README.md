@@ -1,6 +1,9 @@
 # coding-interview
 Apple Silicon の Mac で作成しています。
 
+# 構成
+元々あった api がその他のライブラリと重複していてうまく動作しなかったので、item_api という app に変更しています。
+
 # 事前準備
 Poetry を利用しているので [Poetry をインストール](https://formulae.brew.sh/formula/poetry)してください。
 

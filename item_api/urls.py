@@ -1,10 +1,10 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from item_api.views.company import CompanyListCreateAPIView
+from item_api.views.company import CompanyViewSet
 
-router = DefaultRouter()
-
+router = DefaultRouter(trailing_slash=False)
+router.register('companies', CompanyViewSet, basename='company')
 urlpatterns = [
-    path('companies',   CompanyListCreateAPIView.as_view())
+    path('',   include(router.urls)),
 ]

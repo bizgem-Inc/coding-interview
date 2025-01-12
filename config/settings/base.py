@@ -37,6 +37,10 @@ MIDDLEWARE = [
     "log_request_id.middleware.RequestIDMiddleware",
 ]
 
+REST_FRAMEWORK = {
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'EXCEPTION_HANDLER': 'item_api.exception.custom_exception_handler',
+}
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
