@@ -33,5 +33,23 @@ poetry install
 プロファイルはローカルを指定します。
 
 ```commandline
-python manage.py migrate --settings=config.settings.local
+python manage.py migrate
+```
+
+# アプリケーションの実行
+runserver で実行します。
+
+````commandline
+python manage.py runserver  
+````
+
+# API の実行
+Company と Category があります。
+
+## Company
+非常にシンプルな CRUD です。
+Category が存在する Company は削除できません。
+
+```commandline
+/api/companies
 ```
