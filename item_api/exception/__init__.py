@@ -38,4 +38,9 @@ def custom_exception_handler(exc, context):
                 'message': message
             }
             response.status_code = status_code
+        if response.status_code == 400:
+            if "ErrorDetail(string='This field may not be null.', code='null')" in str(response.data):
+                response.data = {
+                    'message' : 'パラメーターが不足しています'
+                }
     return response

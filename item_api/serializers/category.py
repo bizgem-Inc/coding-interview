@@ -4,7 +4,6 @@ from rest_framework import serializers
 
 from item_api.domain.category_factory import CategoryFactory, CategoryService, CategoryDto
 from item_api.exception.custom_exceptions import RequiredException, NoUpdateParameterException, \
-    AllSameUpdateParameterException
 from item_api.models import Category
 from item_api.serializers import DATE_TIME_FORMAT, validate_require
 
@@ -19,8 +18,8 @@ def validate_category_name(value: Optional[str]) -> str:
 
 
 class CategorySerializer(serializers.Serializer):
-    id = serializers.UUIDField(required=False)
-    company = serializers.UUIDField(required=False)
+    id = serializers.UUIDField(required=False, allow_null=True)
+    company = serializers.UUIDField(required=False, allow_null=True)
     name = serializers.CharField(required=False, allow_null=True, allow_blank=True)  # patch のみ必須であるようにするため。
     parent_category = serializers.UUIDField(required=False, allow_null=True)
     created_at = serializers.DateTimeField(required=False, format=DATE_TIME_FORMAT)
@@ -29,13 +28,15 @@ class CategorySerializer(serializers.Serializer):
     def is_valid(self, *, raise_exception=False):
 
         request_method = self.context.get("request").method
-        if request_method in  ['POST', 'PATCH']:
-            if not self.initial_data.get('name') and not self.initial_data.get('company'):
-                raise NoUpdateParameterException('企業名または親カテゴリ')
+        if request_method in ['POST', 'PUT']:
+            if not self.initial_data.get('name') :
+                raise NoUpdateParameterException('カテゴリ名')
+            if not self.initial_data.get('company') :
+                raise NoUpdateParameterException('企業ID')
 
         if request_method == 'PATCH':
-            if not self.initial_data['company']:
-                raise RequiredException(item_name='企業')
+            if not self.initial_data.get('name') and not self.initial_data.get('company') and not self.initial_data.get('parent_category'):
+                raise NoUpdateParameterException('カテゴリ名または企業IDまたは親カテゴリID')
 
         return super().is_valid(raise_exception=raise_exception)
 
@@ -50,13 +51,19 @@ class CategorySerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
 
-        name = validated_data.get('name', instance.name)
-        company_id=validated_data.get('company', instance.company.id),
-        original_parent_category_id = instance.parent_category.id if instance.parent_category is not None else None
-        parent_category_id=validated_data.get('parent_category', original_parent_category_id)
+        name = validated_data.get('name', None)
+        company_id = validated_data.get('company')
+        company_id= company_id if company_id is not None else instance.company.id
 
-        if name == instance.name and company_id == instance.company.id and parent_category_id == original_parent_category_id:
-            raise AllSameUpdateParameterException()
+        original_category_id = instance.parent_category.id if instance.parent_category is not None else None
+        method = self.context['request'].method
+
+        if method == 'PATCH':
+            # name のみ指定されていない場合は重複チェックをおこわないので、None をいれる。。。
+            parent_category_id = validated_data.get('parent_category')
+            parent_category_id = parent_category_id if parent_category_id is not None else original_category_id
+        else:
+            parent_category_id=validated_data.get('parent_category')
 
         renewed_company, renewed_parent_category = CategoryService.validate_category(
             category=CategoryDto(
@@ -65,8 +72,13 @@ class CategorySerializer(serializers.Serializer):
                 parent_category_id=parent_category_id
             )
         )
-        instance.name = name
-        instance.company = renewed_company
-        instance.parent_category = renewed_parent_category
+        if name is not None:
+            instance.name = name
+        if company_id is not None:
+            instance.company = renewed_company
+        if parent_category_id is not None or method == 'PUT':
+            # PUT の場合は強制的に置き換えるので 親カテゴリIDは NULL でもセットさせる
+            instance.parent_category = renewed_parent_category
+
         instance.save()
         return instance

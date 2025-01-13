@@ -9,7 +9,7 @@ from item_api.exception import uuid_error_message
 from item_api.exception.custom_exceptions import  PutNotAllowedException
 from item_api.models import Company
 from item_api.serializers.company import CompanySerializer
-from item_api.tests import convert_model_to_list
+from item_api.tests import convert_model_to_company_list
 
 
 class CompanyAPITestCase(APITestCase):
@@ -69,7 +69,7 @@ class CompanyAPITestCase(APITestCase):
         results = response.data['results']
         self.assertEquals(len(results), item_count)
         # ソートが降順で行われていること
-        self.assertListEqual(list(results), convert_model_to_list(expected[::-1]))
+        self.assertListEqual(list(results), convert_model_to_company_list(expected[::-1]))
 
 
     def test_retrieve(self):

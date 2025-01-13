@@ -7,8 +7,8 @@ from item_api.models import Company, Category
 
 @dataclass
 class CategoryDto:
-    company_id: uuid.UUID
-    name: str
+    company_id: Optional[uuid.UUID]
+    name: Optional[str]
     parent_category_id: Optional[uuid.UUID]
 
 
@@ -42,19 +42,21 @@ class CategoryService:
             company: Company = Company.objects.get(pk=category.company_id)
         except Company.DoesNotExist:
             raise ConflictedException(message=f'{category.company_id}は存在しない企業IDです。存在する企業を指定してください。')
-        CategoryService._is_valid_company_category(
-            company_id=category.company_id,
-            name=category.name
-        )
+
+        if category.name is not None:
+            CategoryService._is_valid_company_category(
+                company_id=category.company_id,
+                name=category.name
+            )
         parent_category = None
         if category.parent_category_id is not None:
             try:
                 parent_category = Category.objects.get(pk=category.parent_category_id)
             except Category.DoesNotExist:
-                raise ConflictedException(f'親カテゴリ[{category.parent_category_id}]は存在していません。')
+                raise ConflictedException(f'親カテゴリ[{category.parent_category_id}]は存在していません')
 
             if not parent_category.company.id  == category.company_id:
-                raise ConflictedException(f'指定した親カテゴリidは{category.company_id}のものではありません')
+                raise ConflictedException(f'指定した親カテゴリidは[{category.company_id}]のカテゴリではありません')
 
         return company, parent_category
 
