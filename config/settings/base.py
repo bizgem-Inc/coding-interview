@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from typing import List
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-m)88=k-q&^0(0gc=9l2m)=*^^mrme!^)sfv+o61p66z#=m8l)*"
 
-ALLOWED_HOSTS: List[str] = []
+ALLOWED_HOSTS: list[str] = []
 
 # Application definition
 
@@ -24,6 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "corsheaders",
     "item_api",
 ]
 
@@ -39,8 +39,8 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
-    'EXCEPTION_HANDLER': 'item_api.exception.custom_exception_handler',
+    "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    "EXCEPTION_HANDLER": "item_api.exception.custom_exception_handler",
 }
 ROOT_URLCONF = "config.urls"
 
@@ -66,7 +66,9 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -74,63 +76,61 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'request_id': {
-            '()': 'log_request_id.filters.RequestIDFilter'
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "request_id": {"()": "log_request_id.filters.RequestIDFilter"},
+    },
+    "formatters": {
+        "standard": {
+            "format": "{levelname} {asctime} [process={process:d} thread={thread:d}] [場所:{module}.{funcName}:{lineno}] request_id={request_id} {message}",
+            "style": "{",
+        },
+        "django.server": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "[{server_time}] {message}",
+            "style": "{",
         },
     },
-    'formatters': {
-        'standard': {
-            'format': "{levelname} {asctime} [process={process:d} thread={thread:d}] [場所:{module}.{funcName}:{lineno}] request_id={request_id} {message}",
-            'style': '{',
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "filters": ["request_id"],
+            "class": "logging.StreamHandler",
+            "formatter": "standard",
         },
-        'django.server': {
-            '()': 'django.utils.log.ServerFormatter',
-            'format': '[{server_time}] {message}',
-            'style': '{',
-        }
-    },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'filters': ["request_id"],
-            'class': 'logging.StreamHandler',
-            'formatter': 'standard'
-        },
-        'django.server': {
-            'level': 'DEBUG',
-            'filters': ["request_id"],
-            'class': 'logging.StreamHandler',
-            'formatter': 'django.server',
+        "django.server": {
+            "level": "DEBUG",
+            "filters": ["request_id"],
+            "class": "logging.StreamHandler",
+            "formatter": "django.server",
         },
     },
-    'loggers': {
+    "loggers": {
         # 自分で追加したアプリケーション全般のログを拾うロガー
-        '': {
-            'handlers': ['console'],
+        "": {
+            "handlers": ["console"],
             # DJANGO_LOG_LEVEL は Django の仕組みではないですが、公式に書かれているのでそうしました。
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-            'propagate': False,
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "propagate": False,
         },
-        'django': {
-            'handlers': ['console'],
+        "django": {
+            "handlers": ["console"],
             # DJANGO_LOG_LEVEL は Django の仕組みではないですが、公式に書かれているのでそうしました。
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-            'propagate': False,
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "propagate": False,
         },
-        'django.server': {
-            'handlers': ['django.server'],
-            'level': 'INFO',
-            'propagate': False,
+        "django.server": {
+            "handlers": ["django.server"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'django.db.backends': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
         },
-    }
+    },
 }
 
 # Database
@@ -162,3 +162,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOG_REQUEST_ID_HEADER = "HTTP_X_REQUEST_ID"
 # この設定がないと request_id をログ表示できません。
 GENERATE_REQUEST_ID_IF_NOT_IN_HEADER = True
+
+CORS_PREFLIGHT_MAX_AGE = 3

@@ -1,0 +1,27 @@
+name: プルリクエスト時のワークフロー
+on:
+  pull_request:
+    types: [ opened, synchronize ]
+    branches:
+      - main
+jobs:
+  execute_django_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: latest
+      - name: Install dependencies
+        run: poetry install --no-root
+
+      - name: Run tests
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.test  # テスト用設定
+        run: poetry run python manage.py test --keepdb --settings=config.settings.test

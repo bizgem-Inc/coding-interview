@@ -4,7 +4,6 @@ version = "0.0.1"
 description = "境田が Bigeへのために作課題です"
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
-packages = [{include = "sakaida_coding_review"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -20,3 +19,44 @@ django-log-request-id = "^2.1.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+builtins = ["_"]
+# 1行の最大文字数
+line-length = 88
+
+[tool.ruff.lint]
+# チェックするエラーの種類
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+# 除外するエラーの種類
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+    "W191",  # indentation contains tabs
+    "B904", # raise ... from ... になっていない場合のエラーを無視
+]
+
+# ファイルごとのエラー除外
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+# base.py のスターインポートを実現するため
+"config/settings/local.py" = ["F403", "F405"]
+"config/settings/test.py" = ["F403", "F405"]
+
+# isort の設定
+[tool.ruff.lint.isort]
+known-third-party = ["fastapi", "pydantic", "starlette"]
+
+[tool.ruff.lint.pyupgrade]
+# Python3.8互換のための設定
+keep-runtime-typing = true
+

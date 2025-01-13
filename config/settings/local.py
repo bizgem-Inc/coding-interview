@@ -1,4 +1,5 @@
 import os
+
 from .base import *
 
 DEBUG = True
@@ -14,4 +15,4 @@ DATABASES = {
     }
 }
 
-
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
