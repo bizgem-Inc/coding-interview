@@ -2,10 +2,8 @@ import uuid
 from typing import Optional
 
 from . import DATE_TIME_FORMAT, validate_require
-from item_api.models import Company, Category
+from item_api.models import Company
 from rest_framework import serializers
-
-from item_api.exception.custom_exceptions import ConflictedException
 
 def validate_company_name(value: Optional[str]) -> str:
     validate_require(
@@ -13,7 +11,7 @@ def validate_company_name(value: Optional[str]) -> str:
         key_name='name',
         item_name='企業名'
     )
-    return value
+    return str(value)
 
 class CompanySerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False)

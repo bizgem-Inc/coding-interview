@@ -4,9 +4,8 @@ from item_api.serializers.company import CompanySerializer
 from item_api.views import BaseMasterMaintenanceViewSet, CustomPageNumberPagination
 
 
-class CompanyViewSet(BaseMasterMaintenanceViewSet):
+class CompanyAPIView(BaseMasterMaintenanceViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
     pagination_class = CustomPageNumberPagination
-
 

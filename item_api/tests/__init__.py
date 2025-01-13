@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import List, Dict
+from typing import List, Dict, Any
 from uuid import UUID
 from django.db import models
 
@@ -21,7 +21,7 @@ def test_support_serializer(obj: models.Model) -> str:
     raise TypeError(f"Type {type(obj)} not serializable")
 
 
-def convert_to_list(queryset: any) -> List[Dict[str, str]]:
+def convert_to_list(queryset: Any) -> List[Dict[str, str]]:
     return json.loads(json.dumps(list(queryset.values()), default=test_support_serializer))
 
 def convert_model_to_list(django_models: List[models.Model]) -> List[Dict[str, str]]:

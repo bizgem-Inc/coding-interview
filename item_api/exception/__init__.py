@@ -1,5 +1,5 @@
 from pyexpat.errors import messages
-from typing import Optional
+from typing import Optional, Any, Dict
 
 from rest_framework.views import exception_handler
 from rest_framework import exceptions, status
@@ -9,8 +9,9 @@ from item_api.util import uuid_of
 # uuid でリソースを特定するエンドポイント
 path_item_dict: dict[str, str] = {
     'companies' : '企業',
+    'categories' : 'カテゴリ',
 }
-def _get_path_translation(context: any) -> Optional[str]:
+def _get_path_translation(context: Dict[str, Any]) -> Optional[str]:
     path: str = context.get('request').build_absolute_uri()
     # path_item_dict のキーをチェック
     for key, value in path_item_dict.items():

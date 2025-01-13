@@ -1,5 +1,5 @@
 import uuid
-from typing import Callable
+from typing import Callable, Any
 from uuid import UUID
 
 from rest_framework.test import APITestCase
@@ -9,7 +9,7 @@ from item_api.exception import uuid_error_message
 from item_api.exception.custom_exceptions import  PutNotAllowedException
 from item_api.models import Company
 from item_api.serializers.company import CompanySerializer
-from item_api.tests import convert_to_list, convert_model_to_list
+from item_api.tests import convert_model_to_list
 
 
 class CompanyAPITestCase(APITestCase):
@@ -53,7 +53,7 @@ class CompanyAPITestCase(APITestCase):
         self._paging_test(item_count=10, execute_request=lambda: self.client.get(f'{self._url}?page_size=10', format='json'))
 
 
-    def _paging_test(self, item_count: int, execute_request: Callable[[], any]):
+    def _paging_test(self, item_count: int, execute_request: Callable[[], Any]):
         Company.objects.all().delete()
         expected = []
         for index in range(20):
