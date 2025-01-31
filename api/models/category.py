@@ -12,6 +12,8 @@ class Category(models.Model):
     parent_category = models.ForeignKey("self", null=True, related_name="+", on_delete=models.SET_NULL, db_comment="親カテゴリID")
     created_at = models.DateTimeField(auto_now_add=True, editable=False, db_comment="作成日時")
     updated_at = models.DateTimeField(auto_now=True, editable=False, db_comment="更新日時")
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = "categories"
@@ -20,3 +22,4 @@ class Category(models.Model):
         verbose_name_plural = "categories"
         constraints = [models.UniqueConstraint(fields=["company", "name"], name="unique_company_category_combination")]
         indexes = [models.Index(fields=["company", "name"])]
+        ordering = ['created_at']
