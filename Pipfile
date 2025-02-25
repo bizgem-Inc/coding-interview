@@ -4,11 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
-djangorestframework = "*"
+django = "==4.2.4"
+djangorestframework = "==3.14.0"
 psycopg2 = "*"
 
 [dev-packages]
+flake8 = "*"
+factory-boy = "*"
 
 [requires]
 python_version = "3.11"

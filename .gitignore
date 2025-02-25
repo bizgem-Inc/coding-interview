@@ -5,6 +5,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+.python-version
 
 # Installer logs
 pip-log.txt
@@ -40,6 +41,7 @@ venv.bak/
 
 # Editors
 .idea/
+*.swp
 
 static/
 
