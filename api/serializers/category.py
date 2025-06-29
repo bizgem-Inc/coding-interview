@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.core.exceptions import ValidationError as DjangoValidationError
 from api.models import Category, Company
 from rest_framework.fields import UUIDField
 from django.utils.translation import gettext_lazy as _
@@ -38,40 +39,18 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """
-        複合バリデーション
-        - 親カテゴリは同じ会社のカテゴリのみ指定可能
-        - 循環参照の防止
-        - 同じ会社内での名前の重複チェック
+        API特有のバリデーション
+        - モデルのバリデーションを実行
+        - API特有のエラーメッセージにマッピング
         """
-        company = data.get('company')
-        parent_category = data.get('parent_category')
-        name = data.get('name')
+        instance = self.instance or Category()
+        for key, value in data.items():
+            setattr(instance, key, value)
 
-        # 親カテゴリの会社チェック
-        if parent_category and parent_category.company != company:
-            raise serializers.ValidationError({
-                "parent_category": "親カテゴリは同じ会社のカテゴリのみ指定できます"
-            })
-
-        # 循環参照チェック（更新時のみ）
-        if parent_category and self.instance:
-            current = parent_category
-            while current:
-                if current.id == self.instance.id:
-                    raise serializers.ValidationError({
-                        "parent_category": "カテゴリの参照が循環しています"
-                    })
-                current = current.parent_category
-
-        # 同じ会社内での名前の重複チェック
-        if name and company:
-            existing = Category.objects.filter(company=company, name=name)
-            if self.instance:
-                existing = existing.exclude(id=self.instance.id)
-            if existing.exists():
-                raise serializers.ValidationError({
-                    "name": "同じ会社内で同じ名前のカテゴリは作成できません"
-                })
+        try:
+            instance.clean()
+        except DjangoValidationError as e:
+            raise serializers.ValidationError(e.message_dict)
 
         return data
 
