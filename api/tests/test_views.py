@@ -53,7 +53,16 @@ class CategoryViewTests(APITestCase):
         return f"/api/categories/{pk}/"
 
     def test_retrieve(self):
-        pass
+        """
+        It should be able to retrieve all the element in DB.
+        """
+
+        for cat in self.categories:
+            url = self.__retrieve_url(cat.id)
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data["id"], str(cat.id))
 
     def test_retrieve_non_existent_category(self):
         """
