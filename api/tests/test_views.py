@@ -1,3 +1,5 @@
+import uuid
+
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -46,8 +48,23 @@ class CategoryViewTests(APITestCase):
         for cat in response.data:
             self.assertIn(cat["id"], ids_in_db)
 
+    @staticmethod
+    def __retrieve_url(pk):
+        return f"/api/categories/{pk}/"
+
     def test_retrieve(self):
         pass
+
+    def test_retrieve_non_existent_category(self):
+        """
+        It should return 404 Error to retrieve non existent category.
+        """
+
+        pk = uuid.uuid4()
+        url = self.__retrieve_url(pk)
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create(self):
         pass
