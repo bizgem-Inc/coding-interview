@@ -221,3 +221,37 @@ class CategoryViewTests(APITestCase):
         self.assertIn("parent_category", response.data)
         max_depth = getattr(settings, 'CATEGORY_MAX_DEPTH', 3)
         self.assertIn(f"{max_depth}階層まで", str(response.data["parent_category"]))
+    
+    def test_update_parent_exceeds_max_depth(self):
+        """更新により最大階層数を超える場合はエラーになること"""
+        # 初期構造: parent1 -> child2 -> grandchild3
+        parent1 = self.category1
+        child2 = Category.objects.create(
+            name="子カテゴリ",
+            company=self.company,
+            parent_category=parent1
+        )
+        grandchild3 = Category.objects.create(
+            name="孫カテゴリ",
+            company=self.company,
+            parent_category=child2
+        )
+        
+        # 別の親子構造: parentA -> parentB
+        parentA = Category.objects.create(name="親A", company=self.company)
+        parentB = Category.objects.create(
+            name="親B",
+            company=self.company,
+            parent_category=parentA
+        )
+        
+        # child2の親をparentBに変更しようとする（4階層になる）
+        data = {
+            "name": child2.name,
+            "company": str(self.company.id),
+            "parent_category": str(parentB.id)
+        }
+        response = self.client.put(f"/api/categories/{child2.id}/", data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("parent_category", response.data)
+        self.assertIn("4階層", str(response.data["parent_category"]))

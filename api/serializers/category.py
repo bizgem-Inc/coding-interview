@@ -39,8 +39,20 @@ class CategorySerializer(serializers.ModelSerializer):
             
             # 階層の深さをチェック
             max_depth = getattr(settings, 'CATEGORY_MAX_DEPTH', 3)
-            if self.get_depth(value) >= max_depth - 1:
-                raise serializers.ValidationError(f'カテゴリの階層は{max_depth}階層までです。')
+            
+            # 更新時は子孫を含めた階層をチェック
+            if self.instance:
+                # 新しい親の深さ + 自分の子孫の深さ + 1（自分自身）
+                new_total_depth = self.get_depth(value) + self.get_max_descendant_depth(self.instance) + 2
+                if new_total_depth > max_depth:
+                    raise serializers.ValidationError(
+                        f'この変更により階層が{new_total_depth}階層となり、'
+                        f'最大階層数（{max_depth}階層）を超えてしまいます。'
+                    )
+            else:
+                # 作成時は親の深さのみチェック
+                if self.get_depth(value) >= max_depth - 1:
+                    raise serializers.ValidationError(f'カテゴリの階層は{max_depth}階層までです。')
         
         return value
     
@@ -55,3 +67,17 @@ class CategorySerializer(serializers.ModelSerializer):
             if depth > 10:
                 break
         return depth
+    
+    def get_max_descendant_depth(self, category):
+        """カテゴリの子孫の最大深さを取得"""
+        from api.models import Category
+        
+        def get_descendants_depth(cat, current_depth=0):
+            max_depth = current_depth
+            children = Category.objects.filter(parent_category=cat)
+            for child in children:
+                child_depth = get_descendants_depth(child, current_depth + 1)
+                max_depth = max(max_depth, child_depth)
+            return max_depth
+        
+        return get_descendants_depth(category)
