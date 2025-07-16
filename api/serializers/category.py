@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from api.models import Category
@@ -16,12 +17,41 @@ class CategorySerializer(serializers.ModelSerializer):
             )
         ]
     
+    def validate_name(self, value):
+        """カテゴリ名のバリデーション"""
+        max_length = getattr(settings, 'CATEGORY_NAME_MAX_LENGTH', 255)
+        if len(value) > max_length:
+            raise serializers.ValidationError(f'カテゴリ名は{max_length}文字以内で入力してください。')
+        return value
+    
     def validate_parent_category(self, value):
         """親カテゴリのバリデーション"""
         if value:
+            # 自分自身を親に設定できない（更新時のみ）
+            if self.instance and value.id == self.instance.id:
+                raise serializers.ValidationError('自分自身を親カテゴリに設定することはできません。')
+            
             # 作成時のcompanyと親カテゴリのcompanyが一致するか確認
             if 'company' in self.initial_data:
                 company_id = self.initial_data['company']
                 if str(value.company.id) != company_id:
                     raise serializers.ValidationError('親カテゴリは同じ企業のカテゴリである必要があります。')
+            
+            # 階層の深さをチェック
+            max_depth = getattr(settings, 'CATEGORY_MAX_DEPTH', 3)
+            if self.get_depth(value) >= max_depth - 1:
+                raise serializers.ValidationError(f'カテゴリの階層は{max_depth}階層までです。')
+        
         return value
+    
+    def get_depth(self, category):
+        """カテゴリの階層の深さを取得"""
+        depth = 0
+        current = category
+        while current.parent_category:
+            depth += 1
+            current = current.parent_category
+            # 無限ループ防止
+            if depth > 10:
+                break
+        return depth

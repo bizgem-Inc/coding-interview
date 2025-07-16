@@ -108,3 +108,7 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Category API設定
+CATEGORY_NAME_MAX_LENGTH = 255  # カテゴリ名の最大文字数
+CATEGORY_MAX_DEPTH = 3  # 最大階層数（1=フラット、2=親子、3=親子孫）
