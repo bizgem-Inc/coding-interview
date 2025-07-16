@@ -19,6 +19,7 @@ class CategoryViewTests(APITestCase):
 
         # URL (Intentionally hardcoded)
         self.list_url = "/api/categories/"
+        self.create_url = "/api/categories/"
 
     def test_list_no_date(self):
         """
@@ -76,7 +77,36 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create(self):
-        pass
+        """
+        It should create both root category and leaf category.
+        """
+
+        ##
+        # Try to create a root category (without parent_category)
+        ##
+        data = {
+            "name": "cat100",
+            "company": str(self.companies[0].id),
+        }
+
+        response = self.client.post(self.create_url, data, format="json")
+
+        # Check the response
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn("id", response.data)
+        self.assertEqual(response.data["name"], data["name"])
+        self.assertEqual(str(response.data["company"]), data["company"])
+        self.assertIsNone(response.data["parent_category"])
+
+        # Check the DB
+        self.assertEqual(Category.objects.count(), len(self.categories) + 1)
+        ids_in_db = [str(cat.id) for cat in Category.objects.all()]
+        self.assertIn(response.data["id"], ids_in_db)
+
+        cat_in_db = Category.objects.get(pk=uuid.UUID(response.data["id"]))
+        self.assertEqual(cat_in_db.name, data["name"])
+        self.assertEqual(str(cat_in_db.company.id), data["company"])
+        self.assertIsNone(cat_in_db.parent_category)
 
     def test_update(self):
         pass
