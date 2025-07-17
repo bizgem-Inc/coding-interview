@@ -11,11 +11,12 @@ class CategoryViewTests(APITestCase):
         # Dummy Data
         company0 = Company.objects.create(name="com0")
 
-        category0 = Category.objects.create(company=company0, name="cat0", parent_category=None)
-        category0_1 = Category.objects.create(company=company0, name="cat0_1", parent_category=category0)
+        self.category0 = Category.objects.create(company=company0, name="cat0", parent_category=None)
+        self.category0_1 = Category.objects.create(company=company0, name="cat0_1", parent_category=self.category0)
+        self.category1 = Category.objects.create(company=company0, name="cat1", parent_category=None)
 
         self.companies = [company0]
-        self.categories = [category0, category0_1]
+        self.categories = [self.category0, self.category0_1, self.category1]
 
         # URL (Intentionally hardcoded)
         self.list_url = "/api/categories/"
@@ -232,5 +233,27 @@ class CategoryViewTests(APITestCase):
 
         pass
 
+    @staticmethod
+    def __destroy_url(pk):
+        return f"/api/categories/{pk}/"
+
     def test_destroy(self):
         pass
+
+    def test_destroy_leaf(self):
+        """
+        It should delete only the specified category if it is a leaf.
+        """
+
+        cat = self.category0_1
+
+        response = self.client.delete(self.__destroy_url(cat.id))
+
+        # Check the response
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response.data, None)
+
+        # Check the DB
+        self.assertEqual(Category.objects.count(), len(self.categories) - 1)
+        with self.assertRaises(Category.DoesNotExist):
+            Category.objects.get(pk=cat.id)
