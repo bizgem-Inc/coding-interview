@@ -84,29 +84,53 @@ class CategoryViewTests(APITestCase):
         ##
         # Try to create a root category (without parent_category)
         ##
-        data = {
+        data0 = {
             "name": "cat100",
             "company": str(self.companies[0].id),
         }
 
-        response = self.client.post(self.create_url, data, format="json")
+        response0 = self.client.post(self.create_url, data0, format="json")
 
-        # Check the response
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIn("id", response.data)
-        self.assertEqual(response.data["name"], data["name"])
-        self.assertEqual(str(response.data["company"]), data["company"])
-        self.assertIsNone(response.data["parent_category"])
+        # Check the response0
+        self.assertEqual(response0.status_code, status.HTTP_201_CREATED)
+        self.assertIn("id", response0.data)
+        self.assertEqual(response0.data["name"], data0["name"])
+        self.assertEqual(str(response0.data["company"]), data0["company"])
+        self.assertIsNone(response0.data["parent_category"])
 
         # Check the DB
         self.assertEqual(Category.objects.count(), len(self.categories) + 1)
         ids_in_db = [str(cat.id) for cat in Category.objects.all()]
-        self.assertIn(response.data["id"], ids_in_db)
+        self.assertIn(response0.data["id"], ids_in_db)
 
-        cat_in_db = Category.objects.get(pk=uuid.UUID(response.data["id"]))
-        self.assertEqual(cat_in_db.name, data["name"])
-        self.assertEqual(str(cat_in_db.company.id), data["company"])
+        cat_in_db = Category.objects.get(pk=uuid.UUID(response0.data["id"]))
+        self.assertEqual(cat_in_db.name, data0["name"])
+        self.assertEqual(str(cat_in_db.company.id), data0["company"])
         self.assertIsNone(cat_in_db.parent_category)
+
+        ##
+        # Try to create a leaf category
+        ##
+        data1 = {"name": "cat100_1", "company": str(self.companies[0].id), "parent_category": str(response0.data["id"])}
+
+        response1 = self.client.post(self.create_url, data1, format="json")
+
+        # Check the response1
+        self.assertEqual(response1.status_code, status.HTTP_201_CREATED)
+        self.assertIn("id", response1.data)
+        self.assertEqual(response1.data["name"], data1["name"])
+        self.assertEqual(str(response1.data["company"]), data1["company"])
+        self.assertEqual(str(response1.data["parent_category"]), data1["parent_category"])
+
+        # Check the DB
+        self.assertEqual(Category.objects.count(), len(self.categories) + 2)
+        ids_in_db = [str(cat.id) for cat in Category.objects.all()]
+        self.assertIn(response1.data["id"], ids_in_db)
+
+        cat_in_db = Category.objects.get(pk=uuid.UUID(response1.data["id"]))
+        self.assertEqual(cat_in_db.name, data1["name"])
+        self.assertEqual(str(cat_in_db.company.id), data1["company"])
+        self.assertEqual(str(cat_in_db.parent_category.id), data1["parent_category"])
 
     def test_update(self):
         pass
