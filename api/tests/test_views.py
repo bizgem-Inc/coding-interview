@@ -257,3 +257,24 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(Category.objects.count(), len(self.categories) - 1)
         with self.assertRaises(Category.DoesNotExist):
             Category.objects.get(pk=cat.id)
+
+    def test_destroy_root(self):
+        """
+        It should delete only the specified category and the children will be root.
+        """
+
+        cat = self.category0
+        response = self.client.delete(self.__destroy_url(cat.id))
+
+        # Check the response
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response.data, None)
+
+        # Check the DB
+        self.assertEqual(Category.objects.count(), len(self.categories) - 1)
+        with self.assertRaises(Category.DoesNotExist):
+            Category.objects.get(pk=cat.id)
+
+        # Check the child
+        child = Category.objects.get(pk=self.category0_1.id)
+        self.assertIsNone(child.parent_category)
