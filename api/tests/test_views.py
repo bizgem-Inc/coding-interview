@@ -185,6 +185,13 @@ class CategoryViewTests(APITestCase):
         # Check the DB
         self.assertEqual(Category.objects.count(), len(self.categories))
 
+    def test_create_with_different_company(self):
+        """
+        How should it behave if the company is different from that of the parent_category?
+        """
+
+        pass
+
     def test_update(self):
         pass
 
