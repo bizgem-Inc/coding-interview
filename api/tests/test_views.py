@@ -278,3 +278,14 @@ class CategoryViewTests(APITestCase):
         # Check the child
         child = Category.objects.get(pk=self.category0_1.id)
         self.assertIsNone(child.parent_category)
+
+    def test_destroy_non_exist_category(self):
+        """
+        It should cause an error if the specified category does not exist.
+        """
+
+        pk = uuid.uuid4()
+        response = self.client.delete(self.__destroy_url(pk))
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(Category.objects.count(), len(self.categories))
