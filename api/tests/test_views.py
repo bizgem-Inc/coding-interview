@@ -22,6 +22,7 @@ class CategoryViewTests(APITestCase):
         self.list_url = "/api/categories/"
         self.retrieve_url = "/api/categories/{pk}/"
         self.create_url = "/api/categories/"
+        self.update_url = "/api/categories/{pk}/"
 
     def test_list_no_date(self):
         """
@@ -190,10 +191,6 @@ class CategoryViewTests(APITestCase):
 
         pass
 
-    @staticmethod
-    def __update_url(pk):
-        return f"/api/categories/{pk}/"
-
     def test_update_name(self):
         """
         It should change the name.
@@ -202,7 +199,7 @@ class CategoryViewTests(APITestCase):
         for cat in self.categories:
             data = {"name": f"new_{cat.name}"}
 
-            response = self.client.patch(self.__update_url(cat.id), data, format="json")
+            response = self.client.patch(self.update_url.format(pk=cat.id), data, format="json")
 
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(response.data["id"], str(cat.id))
