@@ -234,9 +234,6 @@ class CategoryViewTests(APITestCase):
     def __destroy_url(pk):
         return f"/api/categories/{pk}/"
 
-    def test_destroy(self):
-        pass
-
     def test_destroy_leaf(self):
         """
         It should delete only the specified category if it is a leaf.
