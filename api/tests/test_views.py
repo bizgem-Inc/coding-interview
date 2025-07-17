@@ -166,6 +166,25 @@ class CategoryViewTests(APITestCase):
         # Check the DB
         self.assertEqual(Category.objects.count(), len(self.categories))
 
+    def test_create_non_exist_parent_category(self):
+        """
+        It should return an error if the parent_category does not exist.
+        """
+
+        data = {
+            "name": "cat100",
+            "company": str(self.companies[0].id),
+            "parent_category": str(uuid.uuid4()),
+        }
+
+        response = self.client.post(self.create_url, data, format="json")
+
+        # Check the response0
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Check the DB
+        self.assertEqual(Category.objects.count(), len(self.categories))
+
     def test_update(self):
         pass
 
