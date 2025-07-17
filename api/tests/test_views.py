@@ -23,6 +23,7 @@ class CategoryViewTests(APITestCase):
         self.retrieve_url = "/api/categories/{pk}/"
         self.create_url = "/api/categories/"
         self.update_url = "/api/categories/{pk}/"
+        self.destroy_url = "/api/categories/{pk}/"
 
     def test_list_no_date(self):
         """
@@ -224,10 +225,6 @@ class CategoryViewTests(APITestCase):
 
         pass
 
-    @staticmethod
-    def __destroy_url(pk):
-        return f"/api/categories/{pk}/"
-
     def test_destroy_leaf(self):
         """
         It should delete only the specified category if it is a leaf.
@@ -235,7 +232,7 @@ class CategoryViewTests(APITestCase):
 
         cat = self.category0_1
 
-        response = self.client.delete(self.__destroy_url(cat.id))
+        response = self.client.delete(self.destroy_url.format(pk=cat.id))
 
         # Check the response
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -252,7 +249,7 @@ class CategoryViewTests(APITestCase):
         """
 
         cat = self.category0
-        response = self.client.delete(self.__destroy_url(cat.id))
+        response = self.client.delete(self.destroy_url.format(pk=cat.id))
 
         # Check the response
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -273,7 +270,7 @@ class CategoryViewTests(APITestCase):
         """
 
         pk = uuid.uuid4()
-        response = self.client.delete(self.__destroy_url(pk))
+        response = self.client.delete(self.destroy_url.format(pk=pk))
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(Category.objects.count(), len(self.categories))
