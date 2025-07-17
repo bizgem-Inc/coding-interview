@@ -225,5 +225,12 @@ class CategoryViewTests(APITestCase):
 
         pass
 
+    def test_update_post(self):
+        """
+        How should it behave to updat all?
+        """
+
+        pass
+
     def test_destroy(self):
         pass
