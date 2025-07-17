@@ -197,9 +197,6 @@ class CategoryViewTests(APITestCase):
     def __update_url(pk):
         return f"/api/categories/{pk}/"
 
-    def test_update(self):
-        pass
-
     def test_update_name(self):
         """
         It should change the name.
