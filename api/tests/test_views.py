@@ -218,5 +218,12 @@ class CategoryViewTests(APITestCase):
             else:
                 self.assertEqual(response.data["parent_category"], cat.parent_category.id)
 
+    def test_update_parent_category(self):
+        """
+        How should it behave to update the parent_category?
+        """
+
+        pass
+
     def test_destroy(self):
         pass
