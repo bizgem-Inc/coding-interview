@@ -20,6 +20,7 @@ class CategoryViewTests(APITestCase):
 
         # URL (Intentionally hardcoded)
         self.list_url = "/api/categories/"
+        self.retrieve_url = "/api/categories/{pk}/"
         self.create_url = "/api/categories/"
 
     def test_list_no_date(self):
@@ -50,17 +51,13 @@ class CategoryViewTests(APITestCase):
         for cat in response.data:
             self.assertIn(cat["id"], ids_in_db)
 
-    @staticmethod
-    def __retrieve_url(pk):
-        return f"/api/categories/{pk}/"
-
     def test_retrieve(self):
         """
         It should be able to retrieve all the element in DB.
         """
 
         for cat in self.categories:
-            url = self.__retrieve_url(cat.id)
+            url = self.retrieve_url.format(pk=cat.id)
             response = self.client.get(url)
 
             self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -72,7 +69,7 @@ class CategoryViewTests(APITestCase):
         """
 
         pk = uuid.uuid4()
-        url = self.__retrieve_url(pk)
+        url = self.retrieve_url.format(pk=pk)
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
