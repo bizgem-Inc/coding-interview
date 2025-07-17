@@ -192,8 +192,31 @@ class CategoryViewTests(APITestCase):
 
         pass
 
+    @staticmethod
+    def __update_url(pk):
+        return f"/api/categories/{pk}/"
+
     def test_update(self):
         pass
+
+    def test_update_name(self):
+        """
+        It should change the name.
+        """
+
+        for cat in self.categories:
+            data = {"name": f"new_{cat.name}"}
+
+            response = self.client.patch(self.__update_url(cat.id), data, format="json")
+
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data["id"], str(cat.id))
+            self.assertEqual(response.data["name"], data["name"])
+
+            if cat.parent_category is None:
+                self.assertIsNone(response.data["parent_category"])
+            else:
+                self.assertEqual(response.data["parent_category"], cat.parent_category.id)
 
     def test_destroy(self):
         pass
