@@ -22,14 +22,14 @@ class CategorySerializer(serializers.ModelSerializer):
         current_instance = self.instance if self.instance else None
 
         # check uniqueness of name within company
-        if (
-            Category.objects.filter(company=company, name=name)
-            .exclude(id=current_instance.id)
-            .exists()
-        ):
-            raise serializers.ValidationError(
-                "A category with this name already exists in this company."
-            )
+        if company and name:
+            queryset = Category.objects.filter(company=company, name=name)
+            if current_instance:
+                queryset = queryset.exclude(id=current_instance.id)
+            if queryset.exists():
+                raise serializers.ValidationError(
+                    "A category with this name already exists in this company."
+                )
 
         # check that parent category belongs to the same company
         if parent and parent.company != company:

@@ -40,25 +40,25 @@ class CategoryViewTests(APITestCase):
     # success
     def test_create(self):
         data = {
-            "name": "books",
+            "name": "food",
             "company": str(self.company.id),  # return uuid as str
         }
-        response = self.client.post("/categories/", data, format="json")
+        response = self.client.post("/api/categories/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["name"], "books")
+        self.assertEqual(response.data["name"], "food")
         self.assertEqual(response.data["company"], str(self.company.id))
 
     # failure for empty name
     def test_create_empty_name(self):
         data = {"name": "   ", "company": str(self.company.id)}
-        response = self.client.post("/categories/", data, format="json")
+        response = self.client.post("/api/categories/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("category name cannot be empty", str(response.data))
+        self.assertIn("may not be blank", str(response.data))
 
     # failure for creating duplicate category within same company
     def test_create_duplicate_name(self):
         data = {"name": "food", "company": str(self.company.id)}
-        response = self.client.post("/categories/", data, format="json")
+        response = self.client.post("/api/categories/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("already exists", str(response.data))
 
@@ -73,7 +73,7 @@ class CategoryViewTests(APITestCase):
             "company": str(self.company.id),
             "parent_category": str(other_category.id),
         }
-        response = self.client.post("/categories/", data, format="json")
+        response = self.client.post("/api/categories/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             "Parent category must belong to the same company", str(response.data)
