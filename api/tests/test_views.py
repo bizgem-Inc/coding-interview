@@ -40,13 +40,14 @@ class CategoryViewTests(APITestCase):
     # success
     def test_create(self):
         data = {
-            "name": "food",
+            "name": "books",
             "company": str(self.company.id),  # return uuid as str
         }
         response = self.client.post("/api/categories/", data, format="json")
+        # print("RESPONSE DATA:", response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["name"], "food")
-        self.assertEqual(response.data["company"], str(self.company.id))
+        self.assertEqual(response.data["name"], "books")
+        self.assertEqual(str(response.data["company"]), str(self.company.id))
 
     # failure for empty name
     def test_create_empty_name(self):
