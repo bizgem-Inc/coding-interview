@@ -60,7 +60,7 @@ class CategoryViewTests(APITestCase):
         data = {"name": "food", "company": str(self.company.id)}
         response = self.client.post("/api/categories/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("already exists", str(response.data))
+        self.assertIn("name must make a unique set", str(response.data))
 
     # failure for setting other company's category as its parent category
     def test_create_parent_from_different_company(self):
