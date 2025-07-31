@@ -6,4 +6,13 @@ from ..serializers.category import CategoryModelSerializer
 
 class CategoryViewSet(ModelViewSet):
     serializer_class = CategoryModelSerializer
-    queryset = Category.objects.all()
+
+    def get_queryset(self):
+        return Category.objects.filter(company_id=self._company_id)
+
+    def perform_create(self, serializer):
+        serializer.save(company_id=self._company_id)
+
+    @property
+    def _company_id(self):
+        return self.kwargs["company_id"]
