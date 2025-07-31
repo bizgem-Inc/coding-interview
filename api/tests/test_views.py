@@ -10,6 +10,9 @@ class CategoryViewTests(APITestCase):
         self.parent_category = Category.objects.create(name="Parent Category", company=self.company)
         self.category = Category.objects.create(name="Test Category", company=self.company, parent_category=self.parent_category)
 
+        self.other_company = Company.objects.create(name="Other Company")
+        self.other_company_category = Category.objects.create(name="Other Company Category", company=self.other_company)
+
     def test_list(self):
         response = self.client.get(f"/api/companies/{self.company.id}/categories/")
 
@@ -44,6 +47,15 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.data["name"], "New Category")
         self.assertEqual(response.data["parent_category"], self.parent_category.id)
 
+    def test_create_returns_400_when_parent_category_is_other_company(self):
+        response = self.client.post(f"/api/companies/{self.company.id}/categories/", {
+            "name": "New Category",
+            "parent_category": self.other_company_category.id,
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["parent_category"][0], "不正なカテゴリです")
+
     def test_update_without_parent_category(self):
         response = self.client.put(f"/api/companies/{self.company.id}/categories/{self.category.id}/", {
             "name": "Updated Category"
@@ -61,6 +73,15 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], "Updated Category")
         self.assertEqual(response.data["parent_category"], self.parent_category.id)
+
+    def test_update_returns_400_when_parent_category_is_other_company(self):
+        response = self.client.put(f"/api/companies/{self.company.id}/categories/{self.category.id}/", {
+            "name": "Updated Category",
+            "parent_category": self.other_company_category.id,
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["parent_category"][0], "不正なカテゴリです")
 
     def test_destroy(self):
         response = self.client.delete(f"/api/companies/{self.company.id}/categories/{self.category.id}/")
