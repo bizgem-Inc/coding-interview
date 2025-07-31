@@ -16,6 +16,6 @@ detail_view = CategoryViewSet.as_view({
 })
 
 urlpatterns = [
-    path("companies/<uuid:company_id>/categories/<int:pk>/", detail_view, name="category-detail"),
+    path("companies/<uuid:company_id>/categories/<uuid:pk>/", detail_view, name="category-detail"),
     path("companies/<uuid:company_id>/categories/", list_create_view, name="category-list-create"),
 ]
