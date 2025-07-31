@@ -64,6 +64,14 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data["name"][0], "255文字以内で入力してください")
 
+    def test_create_returns_400_when_name_is_already_exists(self):
+        response = self.client.post(f"/api/companies/{self.company.id}/categories/", {
+            "name": self.category.name,
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["name"][0], "同名のカテゴリが存在します")
+
     def test_update_without_parent_category(self):
         response = self.client.put(f"/api/companies/{self.company.id}/categories/{self.category.id}/", {
             "name": "Updated Category"
@@ -98,6 +106,14 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data["name"][0], "255文字以内で入力してください")
+
+    def test_update_returns_400_when_name_is_already_exists(self):
+        response = self.client.put(f"/api/companies/{self.company.id}/categories/{self.category.id}/", {
+            "name": self.parent_category.name,
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["name"][0], "同名のカテゴリが存在します")
 
     def test_destroy(self):
         response = self.client.delete(f"/api/companies/{self.company.id}/categories/{self.category.id}/")

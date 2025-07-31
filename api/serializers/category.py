@@ -13,6 +13,12 @@ class CategoryModelSerializer(serializers.ModelSerializer):
         allow_null=True
     )
 
+    def validate_name(self, value):
+        instance = self.instance or Category()
+        if Category.objects.filter(name=value, company_id=self.context["company_id"]).exclude(id=instance.id).exists():
+            raise serializers.ValidationError("同名のカテゴリが存在します")
+        return value
+
     def validate_parent_category(self, value):
         parent_category = Category.objects.filter(pk=value.id).first()
         if not parent_category or parent_category.company_id != self.context["company_id"]:
