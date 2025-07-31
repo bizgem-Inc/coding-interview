@@ -6,4 +6,4 @@ from ..models.category import Category
 class CategoryModelSerializer(ModelSerializer):
     class Meta:
         model = Category
-        exclude = ()
+        exclude = ("company",)
