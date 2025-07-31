@@ -56,6 +56,14 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data["parent_category"][0], "不正なカテゴリです")
 
+    def test_create_returns_400_when_name_is_over_character_limit(self):
+        response = self.client.post(f"/api/companies/{self.company.id}/categories/", {
+            "name": "a" * 256,
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["name"][0], "255文字以内で入力してください")
+
     def test_update_without_parent_category(self):
         response = self.client.put(f"/api/companies/{self.company.id}/categories/{self.category.id}/", {
             "name": "Updated Category"
@@ -82,6 +90,14 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data["parent_category"][0], "不正なカテゴリです")
+
+    def test_update_returns_400_when_name_is_over_character_limit(self):
+        response = self.client.put(f"/api/companies/{self.company.id}/categories/{self.category.id}/", {
+            "name": "a" * 256,
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["name"][0], "255文字以内で入力してください")
 
     def test_destroy(self):
         response = self.client.delete(f"/api/companies/{self.company.id}/categories/{self.category.id}/")
