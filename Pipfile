@@ -4,11 +4,24 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
-djangorestframework = "*"
-psycopg2 = "*"
+dj-database-url = "==3.0.1"
+django = "==5.2.4"
+django-silk = "==5.4.0"
+djangorestframework = "==3.16.0"
+drf-yasg = "==1.21.10"
+injector = "==0.22.0"
+psycopg2-binary = "==2.9.10"
+uvicorn = {extras = ["standard"], version = "==0.35.0"}
+whitenoise = "==6.9.0"
 
 [dev-packages]
+factory-boy = "==3.3.3"
+freezegun = "==1.5.5"
+parameterized = "==0.9.0"
+pytest = "==8.4.1"
+pytest-django = "==4.11.1"
+pytest-factoryboy = "==2.8.1"
+ruff = "==0.12.7"
 
 [requires]
 python_version = "3.11"

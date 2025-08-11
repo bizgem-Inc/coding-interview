@@ -42,5 +42,10 @@ venv.bak/
 .idea/
 
 static/
+staticfiles/
 
 .DS_Store
+
+.env
+
+test/
