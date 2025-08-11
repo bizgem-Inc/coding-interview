@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "api",
+    "django_filters",
 ]
 
 MIDDLEWARE = [
@@ -68,7 +69,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": os.environ.get("POSTGRES_DB", "coding-test"),
-        "USER": os.environ.get("POSTGRES_USER", "root"),
+        "USER": os.environ.get("POSTGRES_USER", "postgres"),
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "password"),
         "HOST": os.environ.get("DB_HOST_NAME", "localhost"),
         "PORT": os.environ.get("DB_PORT", "5432"),
@@ -108,3 +109,7 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+}
