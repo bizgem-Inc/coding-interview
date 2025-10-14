@@ -50,13 +50,12 @@ class CategoryViewTests(APITestCase):
 
     def test_update(self):
         updated_category = {
-            "name": "Updated Adidas",
-            "company": self.company.id
+            "name": "Updated Shoes",
         }
         response = self.client.put(self.detail_url(self.category.id), updated_category, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.category.refresh_from_db()
-        self.assertEqual(self.category.name, "Updated Adidas")
+        self.assertEqual(self.category.name, "Updated Shoes")
 
     def test_destroy(self):
         response = self.client.delete(self.detail_url(self.son_category.id))
@@ -96,7 +95,6 @@ class CategoryViewTests(APITestCase):
         )
         updated_son_category = {
             "name": "Updated Yeezy",
-            "company": self.company.id,
             "parent_category": new_category.id
         }
         response = self.client.put(self.detail_url(self.son_category.id), updated_son_category, format='json')
@@ -106,7 +104,6 @@ class CategoryViewTests(APITestCase):
     def test_self_as_parent(self):
         updated_son_category = {
             "name": "Updated Yeezy",
-            "company": self.company.id,
             "parent_category": self.son_category.id
         }
         response = self.client.put(self.detail_url(self.son_category.id), updated_son_category, format='json')
@@ -115,10 +112,22 @@ class CategoryViewTests(APITestCase):
 
     def test_parent_category_cycle(self):
         updated_category = {
-            "name": "Updated Adidas",
-            "company": self.company.id,
+            "name": "Updated Shoes",
             "parent_category": self.son_category.id
         }
         response = self.client.put(self.detail_url(self.category.id), updated_category, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("parent_category", response.data)
+
+    def test_update_company(self):
+        new_company = Company.objects.create(
+            name="Nike"
+        )
+        updated_category = {
+            "name": "Updated Shoes",
+            "company": new_company.id
+        }
+        response = self.client.put(self.detail_url(self.category.id), updated_category, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.category.refresh_from_db()
+        self.assertNotEqual(self.category.company.id, new_company.id)

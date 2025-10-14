@@ -61,6 +61,15 @@ class CategorySerializer(serializers.ModelSerializer):
 
         return attrs
 
+    def get_fields(self):
+        """
+        On create: (no instance) company must be provided.
+        On update: it’s optional, and we’ll ignore any change.
+        """
+        fields = super().get_fields()
+        fields["company"].required = (self.instance is None)
+        return fields
+
     def update(self, instance, validated_data):
         """
         Ignore attempts to change company on update (PUT/PATCH).
