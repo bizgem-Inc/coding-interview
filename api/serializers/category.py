@@ -60,3 +60,10 @@ class CategorySerializer(serializers.ModelSerializer):
         _validate_no_cycle(instance, parent_category)
 
         return attrs
+
+    def update(self, instance, validated_data):
+        """
+        Ignore attempts to change company on update (PUT/PATCH).
+        """
+        validated_data.pop("company", None)
+        return super().update(instance, validated_data)
