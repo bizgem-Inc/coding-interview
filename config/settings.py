@@ -66,7 +66,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.environ.get("POSTGRES_DB", "coding-test"),
         "USER": os.environ.get("POSTGRES_USER", "root"),
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "password"),
