@@ -2,7 +2,7 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 
 from api.models.category import Category
-from api.serializers.category import CategoryListSerializer
+from api.serializers.category import CategoryDetailSerializer, CategoryListSerializer
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -11,7 +11,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return CategoryListSerializer
-        return CategoryListSerializer
+        return CategoryDetailSerializer
 
     def list(self, request, *args, **kwargs):
         company = request.query_params.get("company")
