@@ -29,3 +29,17 @@ class CategoryDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ["id", "company", "name", "parent_category", "created_at", "updated_at"]
+
+
+class CategoryCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["company", "name", "parent_category"]
+
+    def validate(self, data):
+        parent_category = data.get("parent_category")
+        if parent_category and parent_category.company != data["company"]:
+            raise serializers.ValidationError(
+                {"parent_category": "Parent category must belong to the same company."}
+            )
+        return data

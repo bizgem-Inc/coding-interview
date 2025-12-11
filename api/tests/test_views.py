@@ -73,3 +73,104 @@ class CategoryRetrieveTests(APITestCase):
         response = self.client.get(f"/api/categories/{non_existent_id}/")
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class CategoryCreateTests(APITestCase):
+    DETAIL_RESPONSE_FIELDS = {"id", "company", "name", "parent_category", "created_at", "updated_at"}
+
+    def setUp(self):
+        self.company = Company.objects.create(name="Test Company")
+        self.parent_category = Category.objects.create(company=self.company, name="Parent Category")
+
+    # 正常系
+
+    def test_create_with_parent_category_returns_201(self):
+        data = {
+            "company": str(self.company.id),
+            "name": "New Category",
+            "parent_category": str(self.parent_category.id),
+        }
+
+        response = self.client.post("/api/categories/", data)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(set(response.data.keys()), self.DETAIL_RESPONSE_FIELDS)
+        self.assertEqual(Category.objects.filter(name="New Category").count(), 1)
+
+    def test_create_without_parent_category_returns_201(self):
+        data = {
+            "company": str(self.company.id),
+            "name": "New Category",
+        }
+
+        response = self.client.post("/api/categories/", data)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["parent_category"], None)
+
+    # 異常系
+
+    def test_create_without_name_returns_400(self):
+        initial_category_count = Category.objects.count()
+        data = {"company": str(self.company.id)}
+
+        response = self.client.post("/api/categories/", data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Category.objects.count(), initial_category_count)
+
+    def test_create_with_non_existent_company_returns_400(self):
+        import uuid
+
+        initial_category_count = Category.objects.count()
+        data = {
+            "company": str(uuid.uuid4()),
+            "name": "New Category",
+        }
+
+        response = self.client.post("/api/categories/", data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Category.objects.count(), initial_category_count)
+
+    def test_create_with_non_existent_parent_category_returns_400(self):
+        import uuid
+
+        initial_category_count = Category.objects.count()
+        data = {
+            "company": str(self.company.id),
+            "name": "New Category",
+            "parent_category": str(uuid.uuid4()),
+        }
+
+        response = self.client.post("/api/categories/", data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Category.objects.count(), initial_category_count)
+
+    def test_create_with_duplicate_name_returns_400(self):
+        initial_category_count = Category.objects.count()
+        data = {
+            "company": str(self.company.id),
+            "name": "Parent Category",
+        }
+
+        response = self.client.post("/api/categories/", data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Category.objects.count(), initial_category_count)
+
+    def test_create_with_parent_category_from_different_company_returns_400(self):
+        other_company = Company.objects.create(name="Other Company")
+        other_category = Category.objects.create(company=other_company, name="Other Category")
+        initial_category_count = Category.objects.count()
+        data = {
+            "company": str(self.company.id),
+            "name": "New Category",
+            "parent_category": str(other_category.id),
+        }
+
+        response = self.client.post("/api/categories/", data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Category.objects.count(), initial_category_count)
