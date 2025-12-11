@@ -4,6 +4,9 @@ from api.models.category import Category
 from api.models.company import Company
 
 
+# --- Nested Serializers ---
+
+
 class NestedCompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
@@ -14,6 +17,9 @@ class NestedCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ["id", "name"]
+
+
+# --- Response Serializers ---
 
 
 class CategoryListSerializer(serializers.ModelSerializer):
@@ -29,6 +35,9 @@ class CategoryDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ["id", "company", "name", "parent_category", "created_at", "updated_at"]
+
+
+# --- Request Serializers ---
 
 
 class CategoryCreateSerializer(serializers.ModelSerializer):
