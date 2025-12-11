@@ -174,3 +174,120 @@ class CategoryCreateTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Category.objects.count(), initial_category_count)
+
+
+class CategoryUpdateTests(APITestCase):
+    DETAIL_RESPONSE_FIELDS = {"id", "company", "name", "parent_category", "created_at", "updated_at"}
+
+    def setUp(self):
+        self.company = Company.objects.create(name="Test Company")
+        self.parent_category = Category.objects.create(company=self.company, name="Parent Category")
+        self.target_category = Category.objects.create(company=self.company, name="Target Category")
+
+    # 正常系
+
+    def test_update_returns_200(self):
+        data = {
+            "name": "Updated Category",
+            "parent_category": str(self.parent_category.id),
+        }
+
+        response = self.client.put(f"/api/categories/{self.target_category.id}/", data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(set(response.data.keys()), self.DETAIL_RESPONSE_FIELDS)
+
+        self.target_category.refresh_from_db()
+        self.assertEqual(self.target_category.name, "Updated Category")
+        self.assertEqual(self.target_category.parent_category, self.parent_category)
+
+    # 異常系
+
+    def test_update_not_found_returns_404(self):
+        import uuid
+
+        data = {"name": "Updated Category"}
+
+        response = self.client.put(f"/api/categories/{uuid.uuid4()}/", data)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_without_name_returns_400(self):
+        original_name = self.target_category.name
+        data = {}
+
+        response = self.client.put(f"/api/categories/{self.target_category.id}/", data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.target_category.refresh_from_db()
+        self.assertEqual(self.target_category.name, original_name)
+
+    def test_update_with_self_reference_returns_400(self):
+        data = {
+            "name": "Updated Category",
+            "parent_category": str(self.target_category.id),
+        }
+
+        response = self.client.put(f"/api/categories/{self.target_category.id}/", data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.target_category.refresh_from_db()
+        self.assertIsNone(self.target_category.parent_category)
+
+    def test_update_with_parent_category_from_different_company_returns_400(self):
+        other_company = Company.objects.create(name="Other Company")
+        other_category = Category.objects.create(company=other_company, name="Other Category")
+        data = {
+            "name": "Updated Category",
+            "parent_category": str(other_category.id),
+        }
+
+        response = self.client.put(f"/api/categories/{self.target_category.id}/", data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.target_category.refresh_from_db()
+        self.assertIsNone(self.target_category.parent_category)
+
+    def test_update_with_duplicate_name_returns_400(self):
+        original_name = self.target_category.name
+        data = {"name": "Parent Category"}
+
+        response = self.client.put(f"/api/categories/{self.target_category.id}/", data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.target_category.refresh_from_db()
+        self.assertEqual(self.target_category.name, original_name)
+
+
+class CategoryDeleteTests(APITestCase):
+    def setUp(self):
+        self.company = Company.objects.create(name="Test Company")
+        self.target_category = Category.objects.create(company=self.company, name="Target Category")
+
+    # 正常系
+
+    def test_delete_returns_204(self):
+        initial_category_count = Category.objects.count()
+
+        response = self.client.delete(f"/api/categories/{self.target_category.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Category.objects.count(), initial_category_count - 1)
+        self.assertFalse(Category.objects.filter(id=self.target_category.id).exists())
+
+    # 異常系
+
+    def test_delete_not_found_returns_404(self):
+        import uuid
+
+        initial_category_count = Category.objects.count()
+        non_existent_id = uuid.uuid4()
+
+        response = self.client.delete(f"/api/categories/{non_existent_id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(Category.objects.count(), initial_category_count)

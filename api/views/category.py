@@ -6,6 +6,7 @@ from api.serializers.category import (
     CategoryCreateSerializer,
     CategoryDetailSerializer,
     CategoryListSerializer,
+    CategoryUpdateSerializer,
 )
 
 
@@ -17,6 +18,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
             return CategoryListSerializer
         if self.action == "create":
             return CategoryCreateSerializer
+        if self.action in ["update", "partial_update"]:
+            return CategoryUpdateSerializer
         return CategoryDetailSerializer
 
     def list(self, request, *args, **kwargs):
@@ -35,3 +38,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
         return Response(CategoryDetailSerializer(instance).data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = CategoryUpdateSerializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        return Response(CategoryDetailSerializer(instance).data)

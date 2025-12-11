@@ -43,3 +43,31 @@ class CategoryCreateSerializer(serializers.ModelSerializer):
                 {"parent_category": "Parent category must belong to the same company."}
             )
         return data
+
+
+class CategoryUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["name", "parent_category"]
+
+    def validate(self, data):
+        parent_category = data.get("parent_category")
+        if parent_category:
+            if parent_category.id == self.instance.id:
+                raise serializers.ValidationError(
+                    {"parent_category": "Cannot set self as parent category."}
+                )
+            if parent_category.company != self.instance.company:
+                raise serializers.ValidationError(
+                    {"parent_category": "Parent category must belong to the same company."}
+                )
+
+        name = data.get("name")
+        if name and Category.objects.filter(
+            company=self.instance.company, name=name
+        ).exclude(id=self.instance.id).exists():
+            raise serializers.ValidationError(
+                {"name": "Category with this name already exists in this company."}
+            )
+
+        return data
