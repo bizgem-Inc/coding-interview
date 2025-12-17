@@ -1,0 +1,15 @@
+services:
+  db:
+    build: ./docker/db
+    image: mypostgres
+    container_name: mypostgres
+    volumes:
+        - ./data:/data
+    ports:
+        - "5432:5432"
+    environment:
+        POSTGRES_DB: 'coding-test'
+        POSTGRES_USER: 'root'
+        POSTGRES_PASSWORD: 'password'
+        PGDATA: '/data'
+

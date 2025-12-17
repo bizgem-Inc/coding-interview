@@ -86,6 +86,13 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# Pagination
+# https://www.django-rest-framework.org/api-guide/pagination/#api-reference
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+    "PAGE_SIZE_QUERY_PARAM": "page_size",
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
