@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -64,16 +65,25 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.environ.get("POSTGRES_DB", "coding-test"),
-        "USER": os.environ.get("POSTGRES_USER", "root"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "password"),
-        "HOST": os.environ.get("DB_HOST_NAME", "localhost"),
-        "PORT": os.environ.get("DB_PORT", "5432"),
+# テスト時はSQLiteを使用（PostgreSQLが不要）
+if os.environ.get("TESTING") == "1" or "test" in sys.argv:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": os.environ.get("POSTGRES_DB", "coding-test"),
+            "USER": os.environ.get("POSTGRES_USER", "root"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "password"),
+            "HOST": os.environ.get("DB_HOST_NAME", "localhost"),
+            "PORT": os.environ.get("DB_PORT", "5432"),
+        }
+    }
 
 
 # Password validation
