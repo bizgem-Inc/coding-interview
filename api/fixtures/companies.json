@@ -1,0 +1,20 @@
+[
+  {
+    "model": "api.company",
+    "pk": "550e8400-e29b-41d4-a716-446655440000",
+    "fields": {
+      "name": "テスト１",
+      "created_at": "2026-01-10T12:00:00Z",
+      "updated_at": "2026-01-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "api.company",
+    "pk": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+    "fields": {
+      "name": "テスト２",
+      "created_at": "2026-01-10T12:00:00Z",
+      "updated_at": "2026-01-10T12:00:00Z"
+    }
+  }
+]

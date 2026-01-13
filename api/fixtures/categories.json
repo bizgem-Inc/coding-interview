@@ -1,0 +1,35 @@
+[
+    {
+      "model": "api.category",
+      "pk": "7699927d-9d41-477b-891d-5573752e3791",
+      "fields": {
+        "name": "電化製品",
+        "company": "550e8400-e29b-41d4-a716-446655440000",
+        "parent_category": null,
+        "created_at": "2026-01-10T12:00:00Z",
+        "updated_at": "2026-01-10T12:00:00Z"
+      }
+    },
+    {
+      "model": "api.category",
+      "pk": "9f386927-463d-4786-90f7-3c35b804516a",
+      "fields": {
+        "name": "スマートフォン",
+        "company": "550e8400-e29b-41d4-a716-446655440000",
+        "parent_category": "7699927d-9d41-477b-891d-5573752e3791",
+        "created_at": "2026-01-10T12:00:00Z",
+        "updated_at": "2026-01-10T12:00:00Z"
+      }
+    },
+    {
+      "model": "api.category",
+      "pk": "dcc33618-518d-4861-8260-2640026e792c",
+      "fields": {
+        "name": "食品・飲料",
+        "company": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+        "parent_category": null,
+        "created_at": "2026-01-10T12:00:00Z",
+        "updated_at": "2026-01-10T12:00:00Z"
+      }
+    }
+  ]
