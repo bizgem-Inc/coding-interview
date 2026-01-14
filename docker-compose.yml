@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:15
+    container_name: coding-interview-db
+    environment:
+      POSTGRES_DB: coding-test
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  db-data:
