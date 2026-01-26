@@ -44,3 +44,6 @@ venv.bak/
 static/
 
 .DS_Store
+
+# env
+.env
