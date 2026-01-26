@@ -9,3 +9,6 @@ psycopg2-binary==2.9.10
 asgiref==3.7.2
 pytz==2023.3
 sqlparse==0.4.4
+
+# デバッグツール
+debugpy==1.8.0

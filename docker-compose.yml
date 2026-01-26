@@ -26,6 +26,7 @@ services:
       - .:/app
     ports:
       - "8000:8000"
+      - "5678:5678"  # DEBUG用ポート
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-coding-test}
       POSTGRES_USER: ${POSTGRES_USER:-root}

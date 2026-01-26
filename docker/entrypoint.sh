@@ -13,5 +13,14 @@ echo "PostgreSQL started"
 echo "Running migrations..."
 python manage.py migrate --noinput
 
-# コマンドを実行
-exec "$@"
+# DEBUGがTrueの場合、debugpyを有効にする
+if [ "$DEBUG" = "True" ] || [ "$DEBUG" = "true" ]; then
+    echo "DEBUG mode enabled. Starting with debugpy..."
+    # debugpyでDjangoを起動（リモートデバッグ用）
+    # $@から'python'を除いて残りの引数を渡す
+    shift
+    exec python -m debugpy --listen 0.0.0.0:5678 --wait-for-client "$@"
+else
+    # 通常モード
+    exec "$@"
+fi

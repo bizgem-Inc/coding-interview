@@ -100,6 +100,40 @@ docker-compose up -d --build
 http://localhost:8000
 ```
 
+## VSCodeでのリモートデバッグ
+
+### 1. DEBUGモードを有効化
+
+`.env`ファイルで以下を設定：
+```bash
+DEBUG=True
+```
+
+### 2. Dockerコンテナを起動
+
+```bash
+docker-compose up -d
+```
+
+コンテナが debugpy の接続を待機します。
+
+### 3. VS Codeでデバッガーをアタッチ
+
+1. VS Codeで「実行とデバッグ」パネルを開く（Ctrl+Shift+D）
+2. 「Python: Remote Attach (Docker)」を選択
+3. F5 キーを押してデバッガーをアタッチ
+
+### 4. デバッグ開始
+
+- ブレークポイントを設定したいファイルで行番号の左側をクリック
+- APIエンドポイントにアクセスするとブレークポイントで停止
+
+### 通常モード（デバッグなし）
+
+```bash
+DEBUG=False docker-compose up
+```
+
 ## よく使うコマンド
 
 ### コンテナの起動
