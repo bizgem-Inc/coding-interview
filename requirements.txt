@@ -1,13 +1,11 @@
-asgiref==3.7.2
-certifi==2026.1.4
-distlib==0.4.0
+# Django関連
 Django==4.2.4
 djangorestframework==3.14.0
-filelock==3.20.3
-packaging==26.0
-pipenv==2026.0.3
-platformdirs==4.5.1
-psycopg2-binary==2.9.11
+
+# データベース
+psycopg2-binary==2.9.10
+
+# 依存関係
+asgiref==3.7.2
 pytz==2023.3
 sqlparse==0.4.4
-virtualenv==20.36.1
