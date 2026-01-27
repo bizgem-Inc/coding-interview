@@ -241,6 +241,7 @@ docker-compose exec app bash
 ```
 .
 ├── api/                    # APIアプリケーション
+│   ├── migrations/        # マイグレーションファイル（コマンドにより自動生成）
 │   ├── models/            # データモデル
 │   ├── serializers/       # シリアライザー・バリデーション
 │   ├── views/             # ビュー・エンドポイント
