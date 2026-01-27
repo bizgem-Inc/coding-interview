@@ -6,7 +6,6 @@ Django REST FrameworkとPostgreSQLを使用したAPIプロジェクト
 
 - WSL2
 - Docker
-- Docker Compose
 
 ## セットアップ方法
 
@@ -87,7 +86,7 @@ cp .env.sample .env
 ### 3. Dockerコンテナの起動
 
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 ※ 初回起動時は、イメージのビルドとデータベースのマイグレーションが自動的に実行される
@@ -147,7 +146,7 @@ DEBUG=True
 ### 2. Dockerコンテナを起動
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 コンテナが debugpy の接続を待機します。
@@ -166,74 +165,168 @@ docker-compose up -d
 ### 通常モード（デバッグなし）
 
 ```bash
-DEBUG=False docker-compose up
+DEBUG=False docker compose up
 ```
+
+## テストデータの投入
+
+プロジェクトにはSeederコマンドが用意されており、SwaggerUIでAPIの動作確認を行うためのテストデータを簡単に投入できます。
+
+### Seederの実行
+
+```bash
+docker compose exec app python manage.py seed
+```
+
+このコマンドを実行すると、以下のテストデータが自動的に作成されます：
+
+- **企業データ**: 3社（株式会社テストカンパニーA、B、C）
+- **カテゴリデータ**: 各企業に複数のカテゴリ（親カテゴリと子カテゴリを含む）
+
+### 投入されるデータの例
+
+#### 株式会社テストカンパニーA
+- 電化製品（親）
+  - テレビ（子）
+  - 冷蔵庫（子）
+- 家具（親）
+  - ソファ（子）
+
+#### 株式会社テストカンパニーB
+- 食品（親）
+  - 野菜（子）
+  - 果物（子）
+
+#### 株式会社テストカンパニーC
+- 書籍（親）
+- 文房具（親）
+
+**注意**: Seederを実行すると、既存の企業とカテゴリデータは全て削除されます。
+
+## SwaggerUIでのAPI動作確認
+
+### SwaggerUIへのアクセス
+
+```
+http://localhost:8000/api/docs/
+```
+
+### Category APIエンドポイント一覧
+
+以下のエンドポイントをSwaggerUI上で動作確認できます：
+
+1. **GET /api/categories/** - カテゴリ一覧取得
+2. **GET /api/categories/{id}/** - 特定カテゴリ取得（IDはSeederで作成されたUUID）
+3. **POST /api/categories/** - カテゴリ作成
+4. **PUT /api/categories/{id}/** - カテゴリ全体更新
+5. **PATCH /api/categories/{id}/** - カテゴリ部分更新
+6. **DELETE /api/categories/{id}/** - カテゴリ削除
+
+### 動作確認手順（正常系）
+
+#### 1. カテゴリ一覧取得
+1. SwaggerUIで「GET /api/categories/」をクリック
+2. 「Try it out」→「Execute」をクリック
+3. Seederで作成したカテゴリ一覧が表示されることを確認
+
+#### 2. 特定カテゴリ取得
+1. 一覧取得で確認したカテゴリのIDをコピー
+2. 「GET /api/categories/{id}/」をクリック
+3. 「Try it out」→ id欄にUUIDを貼り付け→「Execute」
+4. 該当カテゴリの詳細が表示されることを確認
+
+#### 3. カテゴリ作成
+1. 「POST /api/categories/」をクリック
+2. 「Try it out」→ Request bodyに以下のようなJSONを入力：
+```json
+{
+  "company": "Seederで作成された企業のUUID",
+  "name": "新しいカテゴリ",
+  "parent_category": null
+}
+```
+3. 「Execute」→ 201 Createdが返されることを確認
+
+#### 4. カテゴリ更新（PUT）
+1. 「PUT /api/categories/{id}/」をクリック
+2. 「Try it out」→ idとRequest bodyを入力
+3. 「Execute」→ 200 OKが返されることを確認
+
+#### 5. カテゴリ部分更新（PATCH）
+1. 「PATCH /api/categories/{id}/」をクリック
+2. 「Try it out」→ 更新したいフィールドのみ入力（例: `{"name": "更新後の名前"}`）
+3. 「Execute」→ 200 OKが返されることを確認
+
+#### 6. カテゴリ削除
+1. 「DELETE /api/categories/{id}/」をクリック
+2. 「Try it out」→ 削除対象のidを入力
+3. 「Execute」→ 204 No Contentが返されることを確認
 
 ## よく使うコマンド
 
 ### コンテナの起動
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### コンテナの停止
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ### コンテナの再起動
 
 ```bash
-docker-compose restart
+docker compose restart
 ```
 
 ### ログの確認
 
 ```bash
 # 全てのコンテナのログ
-docker-compose logs -f
+docker compose logs -f
 
 # 特定のコンテナのログ
-docker-compose logs -f app
-docker-compose logs -f db
+docker compose logs -f app
+docker compose logs -f db
 ```
 
 ### マイグレーションの実行
 
 ```bash
-docker-compose exec app python manage.py migrate
+docker compose exec app python manage.py migrate
 ```
 
 ### マイグレーションファイルの作成
 
 ```bash
-docker-compose exec app python manage.py makemigrations
+docker compose exec app python manage.py makemigrations
 ```
 
 ### 管理者ユーザーの作成
 
 ```bash
-docker-compose exec app python manage.py createsuperuser
+docker compose exec app python manage.py createsuperuser
 ```
 
 ### Djangoシェルの起動
 
 ```bash
-docker-compose exec app python manage.py shell
+docker compose exec app python manage.py shell
 ```
 
 ### テストの実行
 
 ```bash
-docker-compose exec app python manage.py test
+docker compose exec app python manage.py test
 ```
 
 ### コンテナ内でコマンドを実行
 
 ```bash
-docker-compose exec app bash
+docker compose exec app bash
 ```
 
 ## プロジェクト構成
@@ -241,15 +334,25 @@ docker-compose exec app bash
 ```
 .
 ├── api/                    # APIアプリケーション
+│   ├── management/        # Django管理コマンド
+│   │   └── commands/     # カスタムコマンド
+│   │       └── seed.py   # テストデータ投入コマンド
 │   ├── migrations/        # マイグレーションファイル（コマンドにより自動生成）
 │   ├── models/            # データモデル
+│   │   ├── category.py   # Categoryモデル
+│   │   └── company.py    # Companyモデル
 │   ├── serializers/       # シリアライザー・バリデーション
+│   │   └── category.py   # Categoryシリアライザー
 │   ├── views/             # ビュー・エンドポイント
+│   │   └── category.py   # Categoryビューセット
 │   └── tests/             # テスト
 ├── config/                # Django設定
+│   ├── settings.py       # プロジェクト設定
+│   └── urls.py           # URLルーティング
 ├── docker/                # Docker関連ファイル
-│   ├── Dockerfile         # Dockerイメージ定義
-│   └── entrypoint.sh      # コンテナ起動スクリプト
+│   └── app/
+│       ├── Dockerfile    # Dockerイメージ定義
+│       └── entrypoint.sh # コンテナ起動スクリプト
 ├── docker-compose.yml     # Docker Compose設定
 ├── .env.sample           # 環境変数サンプル
 ├── requirements.txt      # Python依存関係
@@ -265,13 +368,13 @@ docker-compose exec app bash
 ### データベースをリセットしたい場合
 
 ```bash
-docker-compose down -v
-docker-compose up -d --build
+docker compose down -v
+docker compose up -d --build
 ```
 
 ### コンテナを完全にクリーンアップ
 
 ```bash
-docker-compose down -v --rmi all
-docker-compose up -d --build
+docker compose down -v --rmi all
+docker compose up -d --build
 ```
