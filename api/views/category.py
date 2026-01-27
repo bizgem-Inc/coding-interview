@@ -8,7 +8,7 @@ from api.serializers.category import CategorySerializer
 class CategoryViewSet(viewsets.ModelViewSet):
     """CategoryのCRUD API"""
 
-    queryset = Category.objects.all()
+    queryset = Category.objects.select_related('company', 'parent_category').all()
     serializer_class = CategorySerializer
 
     @extend_schema(
