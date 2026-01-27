@@ -100,6 +100,41 @@ docker-compose up -d --build
 http://localhost:8000
 ```
 
+### 5. pgAdmin（データベース管理ツール）の設定
+
+pgAdminは、PostgreSQLデータベースを視覚的に管理できるWebベースのツールです。
+
+#### pgAdminへのアクセス
+
+ブラウザで以下のURLにアクセスしてください：
+
+```
+http://localhost:5050
+```
+
+#### 初回ログイン
+
+デフォルトの認証情報（`.env`ファイルで変更可能）：
+- Email: `admin@example.com`
+- Password: `admin`
+
+#### PostgreSQLサーバーの登録（初回のみ）
+
+1. pgAdminにログイン後、左側のサーバーツリーで「Servers」を右クリック
+2. 「Register」→「Server...」を選択
+3. 「General」タブ:
+   - Name: `Coding Interview DB`（任意の名前）
+4. 「Connection」タブ:
+   - Host name/address: `db`
+   - Port: `5432`
+   - Maintenance database: `coding-test`（`.env`の`POSTGRES_DB`と同じ）
+   - Username: `root`（`.env`の`POSTGRES_USER`と同じ）
+   - Password: `password`（`.env`の`POSTGRES_PASSWORD`と同じ）
+   - Save password: チェックを入れる（推奨）
+5. 「Save」をクリック
+
+**注意**: サーバー設定はpgAdminのボリュームに保存されるため、コンテナを再起動しても設定は保持されます。
+
 ## VSCodeでのリモートデバッグ
 
 ### 1. DEBUGモードを有効化

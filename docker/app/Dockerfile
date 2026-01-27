@@ -26,7 +26,7 @@ COPY . .
 EXPOSE 8000
 
 # エントリーポイントスクリプトを実行可能にする
-COPY docker/entrypoint.sh /entrypoint.sh
+COPY docker/app/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # エントリーポイントとコマンドを設定
