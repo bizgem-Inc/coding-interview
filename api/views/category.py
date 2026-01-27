@@ -7,7 +7,7 @@ from api.serializers.category import CategorySerializer
 
 class CategoryViewSet(viewsets.ModelViewSet):
     """CategoryのCRUD API"""
-    
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
@@ -91,17 +91,25 @@ class CategoryViewSet(viewsets.ModelViewSet):
                     ),
                     OpenApiExample(
                         "同名カテゴリが既に存在",
-                        value={"name": ["この企業には既に同じ名前のカテゴリが存在します。"]},
+                        value={
+                            "name": ["この企業には既に同じ名前のカテゴリが存在します。"]
+                        },
                         response_only=True,
                     ),
                     OpenApiExample(
                         "親カテゴリが異なる企業",
-                        value={"parent_category": ["親カテゴリは同じ企業に属している必要があります。"]},
+                        value={
+                            "parent_category": [
+                                "親カテゴリは同じ企業に属している必要があります。"
+                            ]
+                        },
                         response_only=True,
                     ),
                     OpenApiExample(
                         "親カテゴリが存在しない",
-                        value={"parent_category": ["指定された親カテゴリが存在しません。"]},
+                        value={
+                            "parent_category": ["指定された親カテゴリが存在しません。"]
+                        },
                         response_only=True,
                     ),
                 ],
@@ -141,22 +149,36 @@ class CategoryViewSet(viewsets.ModelViewSet):
                     ),
                     OpenApiExample(
                         "同名カテゴリが既に存在",
-                        value={"name": ["この企業には既に同じ名前のカテゴリが存在します。"]},
+                        value={
+                            "name": ["この企業には既に同じ名前のカテゴリが存在します。"]
+                        },
                         response_only=True,
                     ),
                     OpenApiExample(
                         "自己参照エラー",
-                        value={"parent_category": ["カテゴリ自身を親カテゴリに設定することはできません。"]},
+                        value={
+                            "parent_category": [
+                                "カテゴリ自身を親カテゴリに設定することはできません。"
+                            ]
+                        },
                         response_only=True,
                     ),
                     OpenApiExample(
                         "循環参照エラー",
-                        value={"parent_category": ["循環参照が発生するため、この親カテゴリは設定できません。"]},
+                        value={
+                            "parent_category": [
+                                "循環参照が発生するため、この親カテゴリは設定できません。"
+                            ]
+                        },
                         response_only=True,
                     ),
                     OpenApiExample(
                         "親カテゴリが異なる企業",
-                        value={"parent_category": ["親カテゴリは同じ企業に属している必要があります。"]},
+                        value={
+                            "parent_category": [
+                                "親カテゴリは同じ企業に属している必要があります。"
+                            ]
+                        },
                         response_only=True,
                     ),
                 ],
@@ -206,17 +228,27 @@ class CategoryViewSet(viewsets.ModelViewSet):
                     ),
                     OpenApiExample(
                         "同名カテゴリが既に存在",
-                        value={"name": ["この企業には既に同じ名前のカテゴリが存在します。"]},
+                        value={
+                            "name": ["この企業には既に同じ名前のカテゴリが存在します。"]
+                        },
                         response_only=True,
                     ),
                     OpenApiExample(
                         "自己参照エラー",
-                        value={"parent_category": ["カテゴリ自身を親カテゴリに設定することはできません。"]},
+                        value={
+                            "parent_category": [
+                                "カテゴリ自身を親カテゴリに設定することはできません。"
+                            ]
+                        },
                         response_only=True,
                     ),
                     OpenApiExample(
                         "循環参照エラー",
-                        value={"parent_category": ["循環参照が発生するため、この親カテゴリは設定できません。"]},
+                        value={
+                            "parent_category": [
+                                "循環参照が発生するため、この親カテゴリは設定できません。"
+                            ]
+                        },
                         response_only=True,
                     ),
                 ],

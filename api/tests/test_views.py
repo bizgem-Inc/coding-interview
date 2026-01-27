@@ -16,19 +16,13 @@ class CategoryViewTests(APITestCase):
 
         # テスト用のカテゴリを作成
         self.category1 = Category.objects.create(
-            company=self.company1,
-            name="カテゴリ1",
-            parent_category=None
+            company=self.company1, name="カテゴリ1", parent_category=None
         )
         self.category2 = Category.objects.create(
-            company=self.company1,
-            name="カテゴリ2",
-            parent_category=self.category1
+            company=self.company1, name="カテゴリ2", parent_category=self.category1
         )
         self.category3 = Category.objects.create(
-            company=self.company2,
-            name="カテゴリ3",
-            parent_category=None
+            company=self.company2, name="カテゴリ3", parent_category=None
         )
 
     def test_list(self):
@@ -72,7 +66,7 @@ class CategoryViewTests(APITestCase):
         data = {
             "company": str(self.company1.id),
             "name": "新規カテゴリ",
-            "parent_category": None
+            "parent_category": None,
         }
 
         # APIリクエスト
@@ -101,7 +95,7 @@ class CategoryViewTests(APITestCase):
         data = {
             "company": str(self.company1.id),
             "name": "子カテゴリ",
-            "parent_category": str(self.category1.id)
+            "parent_category": str(self.category1.id),
         }
 
         # APIリクエスト
@@ -126,7 +120,7 @@ class CategoryViewTests(APITestCase):
         data = {
             "company": str(self.company1.id),
             "name": "更新されたカテゴリ1",
-            "parent_category": None
+            "parent_category": None,
         }
 
         # APIリクエスト
@@ -150,15 +144,14 @@ class CategoryViewTests(APITestCase):
         # category3をcategory1の子カテゴリに変更（異なる企業なので新しい親を作成）
         # まず同じ企業の別のカテゴリを作成
         new_parent = Category.objects.create(
-            company=self.company2,
-            name="新しい親カテゴリ"
+            company=self.company2, name="新しい親カテゴリ"
         )
 
         # リクエストデータ
         data = {
             "company": str(self.company2.id),
             "name": "更新されたカテゴリ3",
-            "parent_category": str(new_parent.id)
+            "parent_category": str(new_parent.id),
         }
 
         # APIリクエスト
@@ -178,9 +171,7 @@ class CategoryViewTests(APITestCase):
     def test_partial_update(self):
         """【正常系】カテゴリ部分更新のテスト (PATCH /api/categories/{id}/)"""
         # リクエストデータ（名前のみ更新）
-        data = {
-            "name": "部分更新されたカテゴリ"
-        }
+        data = {"name": "部分更新されたカテゴリ"}
 
         # APIリクエスト
         url = f"/api/categories/{self.category1.id}/"
@@ -191,7 +182,9 @@ class CategoryViewTests(APITestCase):
 
         # レスポンスデータの確認
         self.assertEqual(response.data["name"], "部分更新されたカテゴリ")
-        self.assertEqual(str(response.data["company"]), str(self.company1.id))  # 変更されていない
+        self.assertEqual(
+            str(response.data["company"]), str(self.company1.id)
+        )  # 変更されていない
 
         # データベースが更新されていることを確認
         self.category1.refresh_from_db()
@@ -201,15 +194,10 @@ class CategoryViewTests(APITestCase):
     def test_partial_update_parent_category(self):
         """【正常系】親カテゴリのみを部分更新するテスト"""
         # 新しい親カテゴリを作成
-        new_parent = Category.objects.create(
-            company=self.company1,
-            name="新しい親"
-        )
+        new_parent = Category.objects.create(company=self.company1, name="新しい親")
 
         # リクエストデータ（親カテゴリのみ更新）
-        data = {
-            "parent_category": str(new_parent.id)
-        }
+        data = {"parent_category": str(new_parent.id)}
 
         # APIリクエスト
         url = f"/api/categories/{self.category1.id}/"
@@ -232,9 +220,7 @@ class CategoryViewTests(APITestCase):
         self.assertIsNotNone(self.category2.parent_category)
 
         # リクエストデータ（親カテゴリをnullに設定）
-        data = {
-            "parent_category": None
-        }
+        data = {"parent_category": None}
 
         # APIリクエスト
         url = f"/api/categories/{self.category2.id}/"
@@ -268,7 +254,9 @@ class CategoryViewTests(APITestCase):
     def test_destroy_category_with_children(self):
         """【正常系】子カテゴリを持つカテゴリの削除テスト"""
         # category1は子カテゴリ(category2)を持っている
-        self.assertTrue(Category.objects.filter(parent_category=self.category1).exists())
+        self.assertTrue(
+            Category.objects.filter(parent_category=self.category1).exists()
+        )
 
         # APIリクエスト
         url = f"/api/categories/{self.category1.id}/"
@@ -292,11 +280,7 @@ class CategoryViewTests(APITestCase):
 
     def test_create_with_empty_name(self):
         """【異常系】空文字のカテゴリ名で作成"""
-        data = {
-            "company": str(self.company1.id),
-            "name": "",
-            "parent_category": None
-        }
+        data = {"company": str(self.company1.id), "name": "", "parent_category": None}
 
         url = "/api/categories/"
         response = self.client.post(url, data, format="json")
@@ -310,7 +294,7 @@ class CategoryViewTests(APITestCase):
         data = {
             "company": str(self.company1.id),
             "name": "   ",
-            "parent_category": None
+            "parent_category": None,
         }
 
         url = "/api/categories/"
@@ -325,7 +309,7 @@ class CategoryViewTests(APITestCase):
         data = {
             "company": str(self.company1.id),
             "name": "あ" * 256,  # 256文字
-            "parent_category": None
+            "parent_category": None,
         }
 
         url = "/api/categories/"
@@ -333,7 +317,9 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("name", response.data)
-        self.assertEqual(response.data["name"][0], "カテゴリ名は255文字以内で入力してください。")
+        self.assertEqual(
+            response.data["name"][0], "カテゴリ名は255文字以内で入力してください。"
+        )
 
     # カテゴリ名の一意性チェック
 
@@ -342,7 +328,7 @@ class CategoryViewTests(APITestCase):
         data = {
             "company": str(self.company1.id),
             "name": "カテゴリ1",  # 既に存在
-            "parent_category": None
+            "parent_category": None,
         }
 
         url = "/api/categories/"
@@ -350,7 +336,10 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("non_field_errors", response.data)
-        self.assertEqual(response.data["non_field_errors"][0], "この企業には既に同じ名前のカテゴリが存在します。")
+        self.assertEqual(
+            response.data["non_field_errors"][0],
+            "この企業には既に同じ名前のカテゴリが存在します。",
+        )
 
     def test_update_with_duplicate_name_in_same_company(self):
         """【異常系】同じ企業内に既に存在するカテゴリ名に更新"""
@@ -358,7 +347,7 @@ class CategoryViewTests(APITestCase):
         data = {
             "company": str(self.company1.id),
             "name": "カテゴリ1",  # category1と重複
-            "parent_category": None
+            "parent_category": None,
         }
 
         url = f"/api/categories/{self.category2.id}/"
@@ -366,7 +355,10 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("non_field_errors", response.data)
-        self.assertEqual(response.data["non_field_errors"][0], "この企業には既に同じ名前のカテゴリが存在します。")
+        self.assertEqual(
+            response.data["non_field_errors"][0],
+            "この企業には既に同じ名前のカテゴリが存在します。",
+        )
 
     # 親カテゴリの企業所属チェック
 
@@ -375,7 +367,7 @@ class CategoryViewTests(APITestCase):
         data = {
             "company": str(self.company1.id),
             "name": "新規カテゴリ",
-            "parent_category": str(self.category3.id)  # company2のカテゴリ
+            "parent_category": str(self.category3.id),  # company2のカテゴリ
         }
 
         url = "/api/categories/"
@@ -383,14 +375,17 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("non_field_errors", response.data)
-        self.assertEqual(response.data["non_field_errors"][0], "親カテゴリは同じ企業に属している必要があります。")
+        self.assertEqual(
+            response.data["non_field_errors"][0],
+            "親カテゴリは同じ企業に属している必要があります。",
+        )
 
     def test_update_with_parent_from_different_company(self):
         """【異常系】異なる企業のカテゴリを親として設定して更新"""
         data = {
             "company": str(self.company1.id),
             "name": "カテゴリ1",
-            "parent_category": str(self.category3.id)  # company2のカテゴリ
+            "parent_category": str(self.category3.id),  # company2のカテゴリ
         }
 
         url = f"/api/categories/{self.category1.id}/"
@@ -398,7 +393,10 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("non_field_errors", response.data)
-        self.assertEqual(response.data["non_field_errors"][0], "親カテゴリは同じ企業に属している必要があります。")
+        self.assertEqual(
+            response.data["non_field_errors"][0],
+            "親カテゴリは同じ企業に属している必要があります。",
+        )
 
     # 自己参照チェック（更新時）
 
@@ -407,7 +405,7 @@ class CategoryViewTests(APITestCase):
         data = {
             "company": str(self.company1.id),
             "name": "カテゴリ1",
-            "parent_category": str(self.category1.id)  # 自分自身
+            "parent_category": str(self.category1.id),  # 自分自身
         }
 
         url = f"/api/categories/{self.category1.id}/"
@@ -415,7 +413,10 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("non_field_errors", response.data)
-        self.assertEqual(response.data["non_field_errors"][0], "カテゴリ自身を親カテゴリに設定することはできません。")
+        self.assertEqual(
+            response.data["non_field_errors"][0],
+            "カテゴリ自身を親カテゴリに設定することはできません。",
+        )
 
     def test_partial_update_with_self_as_parent(self):
         """【異常系】カテゴリ自身を親カテゴリに設定して部分更新"""
@@ -428,7 +429,10 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("non_field_errors", response.data)
-        self.assertEqual(response.data["non_field_errors"][0], "カテゴリ自身を親カテゴリに設定することはできません。")
+        self.assertEqual(
+            response.data["non_field_errors"][0],
+            "カテゴリ自身を親カテゴリに設定することはできません。",
+        )
 
     # 循環参照チェック（更新時）
 
@@ -439,7 +443,7 @@ class CategoryViewTests(APITestCase):
         data = {
             "company": str(self.company1.id),
             "name": "カテゴリ1",
-            "parent_category": str(self.category2.id)  # 子を親にする
+            "parent_category": str(self.category2.id),  # 子を親にする
         }
 
         url = f"/api/categories/{self.category1.id}/"
@@ -447,35 +451,38 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("non_field_errors", response.data)
-        self.assertEqual(response.data["non_field_errors"][0], "循環参照が発生するため、この親カテゴリは設定できません。")
+        self.assertEqual(
+            response.data["non_field_errors"][0],
+            "循環参照が発生するため、この親カテゴリは設定できません。",
+        )
 
     def test_partial_update_with_circular_reference(self):
         """【異常系】循環参照が発生する親カテゴリを設定して部分更新"""
         # 深い階層での循環参照テスト
         # category1 → category2 → category3_new の階層を作成
         category3_new = Category.objects.create(
-            company=self.company1,
-            name="カテゴリ3_新規",
-            parent_category=self.category2
+            company=self.company1, name="カテゴリ3_新規", parent_category=self.category2
         )
 
         # category1の親をcategory3_newに設定すると循環参照
-        data = {
-            "parent_category": str(category3_new.id)
-        }
+        data = {"parent_category": str(category3_new.id)}
 
         url = f"/api/categories/{self.category1.id}/"
         response = self.client.patch(url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("non_field_errors", response.data)
-        self.assertEqual(response.data["non_field_errors"][0], "循環参照が発生するため、この親カテゴリは設定できません。")
+        self.assertEqual(
+            response.data["non_field_errors"][0],
+            "循環参照が発生するため、この親カテゴリは設定できません。",
+        )
 
     # 404エラーケース
 
     def test_retrieve_non_existent_category(self):
         """【異常系】存在しないカテゴリの取得"""
         import uuid
+
         non_existent_id = uuid.uuid4()
 
         url = f"/api/categories/{non_existent_id}/"
@@ -486,12 +493,13 @@ class CategoryViewTests(APITestCase):
     def test_update_non_existent_category(self):
         """【異常系】存在しないカテゴリの更新"""
         import uuid
+
         non_existent_id = uuid.uuid4()
 
         data = {
             "company": str(self.company1.id),
             "name": "更新カテゴリ",
-            "parent_category": None
+            "parent_category": None,
         }
 
         url = f"/api/categories/{non_existent_id}/"
@@ -502,11 +510,10 @@ class CategoryViewTests(APITestCase):
     def test_partial_update_non_existent_category(self):
         """【異常系】存在しないカテゴリの部分更新"""
         import uuid
+
         non_existent_id = uuid.uuid4()
 
-        data = {
-            "name": "更新カテゴリ"
-        }
+        data = {"name": "更新カテゴリ"}
 
         url = f"/api/categories/{non_existent_id}/"
         response = self.client.patch(url, data, format="json")
@@ -516,6 +523,7 @@ class CategoryViewTests(APITestCase):
     def test_destroy_non_existent_category(self):
         """【異常系】存在しないカテゴリの削除"""
         import uuid
+
         non_existent_id = uuid.uuid4()
 
         url = f"/api/categories/{non_existent_id}/"

@@ -369,6 +369,51 @@ docker compose exec app python manage.py test --parallel
 - **テストデータベース**: 各テスト実行時に新規作成され、テスト終了後に削除されます
 - **本番データへの影響**: テストは独立したデータベースで実行されるため、本番データに影響しません
 
+### コードフォーマットとリント（Ruff）
+
+Ruffは高速なPythonリンター＆フォーマッターです。コード品質を維持するために使用します。
+
+#### Dockerコンテナ内で実行
+
+```bash
+# リントチェック（問題を検出）
+docker compose exec app ruff check .
+
+# リントチェック＋自動修正
+docker compose exec app ruff check --fix .
+
+# コードフォーマット
+docker compose exec app ruff format .
+
+# フォーマットチェックのみ（変更なし）
+docker compose exec app ruff format --check .
+```
+
+#### ローカル環境で実行（仮想環境を有効化後）
+
+```bash
+# 仮想環境を有効化
+source venv/bin/activate
+
+# リントチェック
+ruff check .
+
+# リントチェック＋自動修正
+ruff check --fix .
+
+# コードフォーマット
+ruff format .
+
+# フォーマットチェックのみ
+ruff format --check .
+```
+
+#### Ruffの使い分け
+
+- **開発中**: `ruff check --fix .` と `ruff format .` を実行してコードを整形
+- **CI/CD**: `ruff check .` と `ruff format --check .` でチェックのみ実行
+- **コミット前**: コードの品質を保つため、変更をコミットする前に実行することを推奨
+
 ### コンテナ内でコマンドを実行
 
 ```bash

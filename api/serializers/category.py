@@ -15,21 +15,28 @@ class CategorySerializer(serializers.ModelSerializer):
     # 空文字を許可してカスタムバリデーションで処理
     # max_lengthは指定せず、カスタムバリデーションで処理
     name = serializers.CharField(allow_blank=True)
-    
+
     # parent_categoryのカスタムバリデーション用にPrimaryKeyRelatedFieldを定義
     parent_category = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(),
         required=False,
         allow_null=True,
         error_messages={
-            'does_not_exist': '指定された親カテゴリが存在しません。',
-            'incorrect_type': '指定された親カテゴリが存在しません。',
-        }
+            "does_not_exist": "指定された親カテゴリが存在しません。",
+            "incorrect_type": "指定された親カテゴリが存在しません。",
+        },
     )
 
     class Meta:
         model = Category
-        fields = ["id", "company", "name", "parent_category", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "company",
+            "name",
+            "parent_category",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
     def validate_name(self, value: str) -> str:
@@ -37,7 +44,9 @@ class CategorySerializer(serializers.ModelSerializer):
         if not value or not value.strip():
             raise serializers.ValidationError("カテゴリ名は必須です。")
         if len(value.strip()) > 255:
-            raise serializers.ValidationError("カテゴリ名は255文字以内で入力してください。")
+            raise serializers.ValidationError(
+                "カテゴリ名は255文字以内で入力してください。"
+            )
         return value.strip()
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
@@ -49,9 +58,9 @@ class CategorySerializer(serializers.ModelSerializer):
         if self.instance:
             # 更新時: 同じ company + name の組み合わせが他に存在しないかチェック
             if company and name:
-                existing = Category.objects.filter(
-                    company=company, name=name
-                ).exclude(id=self.instance.id) # 更新時は現在のインスタンスを除外
+                existing = Category.objects.filter(company=company, name=name).exclude(
+                    id=self.instance.id
+                )  # 更新時は現在のインスタンスを除外
                 if existing.exists():
                     raise serializers.ValidationError(
                         "この企業には既に同じ名前のカテゴリが存在します。"
