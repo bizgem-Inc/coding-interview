@@ -12,3 +12,6 @@ sqlparse==0.4.4
 
 # デバッグツール
 debugpy==1.8.0
+
+# API定義
+drf-spectacular==0.29.0
