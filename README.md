@@ -319,9 +319,55 @@ docker compose exec app python manage.py shell
 
 ### テストの実行
 
+#### 全テストの実行
+
 ```bash
 docker compose exec app python manage.py test
 ```
+
+#### 特定のテストファイルの実行
+
+```bash
+# api/tests/test_views.pyのテストのみ実行
+docker compose exec app python manage.py test api.tests.test_views
+```
+
+#### 特定のテストクラスの実行
+
+```bash
+# CategoryViewTestsクラスのテストのみ実行
+docker compose exec app python manage.py test api.tests.test_views.CategoryViewTests
+```
+
+#### 特定のテストメソッドの実行
+
+```bash
+# test_listメソッドのみ実行
+docker compose exec app python manage.py test api.tests.test_views.CategoryViewTests.test_list
+```
+
+#### 詳細な出力でテストを実行
+
+```bash
+# より詳しい出力（verboseモード）
+docker compose exec app python manage.py test --verbosity=2
+
+# 最も詳しい出力
+docker compose exec app python manage.py test --verbosity=3
+```
+
+#### テストの並列実行（高速化）
+
+```bash
+# 並列でテストを実行（CPUコア数に応じて自動調整）
+docker compose exec app python manage.py test --parallel
+```
+
+#### テスト実行のヒント
+
+- **初回テスト実行時**: テスト用のデータベースが自動的に作成されます
+- **テストデータベース**: 各テスト実行時に新規作成され、テスト終了後に削除されます
+- **本番データへの影響**: テストは独立したデータベースで実行されるため、本番データに影響しません
 
 ### コンテナ内でコマンドを実行
 
