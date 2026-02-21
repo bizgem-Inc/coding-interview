@@ -1,6 +1,12 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+from .views.category import CategoryViewSet
 
 router = DefaultRouter()
+
+app_name = "api"
+
+# CategoryのCRUD API
+router.register(r"category", CategoryViewSet, basename="category")
 
 urlpatterns = [path("", include(router.urls))]
