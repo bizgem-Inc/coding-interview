@@ -29,6 +29,8 @@ cover/
 # Django stuff:
 *.log
 local_settings.py
+db.sqlite3
+*_dev.py
 
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
 __pypackages__/
