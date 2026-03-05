@@ -28,10 +28,6 @@ class CategoryViewTests(APITestCase):
         self.list_url = "/api/categories/"
         self.parent_detail_url = f"/api/categories/{self.parent_category.id}/"
         self.child_detail_url = f"/api/categories/{self.child_category.id}/"
-
-    # ------------------------------------------------------------------ #
-    # 一覧取得 (LIST)
-    # ------------------------------------------------------------------ #
     def test_list(self):
         """カテゴリ一覧を取得できること"""
         response = self.client.get(self.list_url)
@@ -44,10 +40,6 @@ class CategoryViewTests(APITestCase):
         response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 0)
-
-    # ------------------------------------------------------------------ #
-    # 詳細取得 (RETRIEVE)
-    # ------------------------------------------------------------------ #
     def test_retrieve(self):
         """カテゴリ詳細を取得できること"""
         response = self.client.get(self.parent_detail_url)
@@ -70,10 +62,6 @@ class CategoryViewTests(APITestCase):
         url = f"/api/categories/{uuid.uuid4()}/"
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    # ------------------------------------------------------------------ #
-    # 作成 (CREATE)
-    # ------------------------------------------------------------------ #
     def test_create(self):
         """有効なデータでカテゴリを作成できること"""
         data = {
@@ -188,10 +176,6 @@ class CategoryViewTests(APITestCase):
         response = self.client.post(self.list_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("parent_category", response.data)
-
-    # ------------------------------------------------------------------ #
-    # 更新 (UPDATE / PARTIAL UPDATE)
-    # ------------------------------------------------------------------ #
     def test_update(self):
         """PUT でカテゴリを更新できること"""
         data = {
@@ -254,10 +238,6 @@ class CategoryViewTests(APITestCase):
         }
         response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    # ------------------------------------------------------------------ #
-    # 削除 (DESTROY)
-    # ------------------------------------------------------------------ #
     def test_destroy(self):
         """カテゴリを削除できること"""
         category = Category.objects.create(
@@ -286,10 +266,6 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         child.refresh_from_db()
         self.assertIsNone(child.parent_category)
-
-    # ------------------------------------------------------------------ #
-    # バリデーション追加テスト
-    # ------------------------------------------------------------------ #
     def test_name_max_length(self):
         """name が 255 文字を超える場合 400 エラーが返ること"""
         data = {
