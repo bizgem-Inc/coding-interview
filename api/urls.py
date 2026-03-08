@@ -13,4 +13,11 @@ urlpatterns = [
             "get": "list"
         }),
     ),
+    path(
+        "companies/<uuid:company_id>/categories/<uuid:category_id>/",
+        CategoryViewSet.as_view({
+            "get": "retrieve",
+            "delete": "destroy"
+        }),
+    ),
 ]

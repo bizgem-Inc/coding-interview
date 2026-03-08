@@ -10,3 +10,6 @@ class CategoryRepository:
 
     def find(self, company_id: uuid, category_id: uuid):
         return Category.objects.filter(company_id = company_id, id = category_id).first()
+
+    def delete(self, category: Category):
+        return category.delete()
