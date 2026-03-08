@@ -1,6 +1,6 @@
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from rest_framework import status
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
@@ -32,8 +32,12 @@ class CategoryViewSet(ViewSet):
 
         try:
             category_destroy_service.handle(company_id, category_id)
+
         except NotFound as e:
             raise Http404(str(e.detail))
+
+        except ValidationError as e:
+            return HttpResponseBadRequest(str(e.detail))
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 

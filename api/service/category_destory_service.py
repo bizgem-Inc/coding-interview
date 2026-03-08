@@ -1,6 +1,6 @@
 import uuid
 
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 
 from api.repository import CategoryRepository
 
@@ -16,4 +16,7 @@ class CategoryDestroyService:
         if category is None:
             raise NotFound("Category not found")
 
-        return self.category_repository.delete(category)
+        if self.category_repository.has_children(category.id):
+            raise ValidationError("Category has child categories")
+
+        return self.category_repository.delete(category.id)
