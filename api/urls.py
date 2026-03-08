@@ -10,7 +10,8 @@ urlpatterns = [
     path(
         "companies/<uuid:company_id>/categories/",
         CategoryViewSet.as_view({
-            "get": "list"
+            "get": "list",
+            "post": "create",
         }),
     ),
     path(
