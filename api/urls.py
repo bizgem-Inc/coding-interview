@@ -18,6 +18,7 @@ urlpatterns = [
         "companies/<uuid:company_id>/categories/<uuid:category_id>/",
         CategoryViewSet.as_view({
             "get": "retrieve",
+            "put": "update",
             "delete": "destroy"
         }),
     ),

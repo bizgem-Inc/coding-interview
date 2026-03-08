@@ -2,7 +2,7 @@ import uuid
 
 from rest_framework.exceptions import NotFound, ValidationError
 
-from api.repository import CategoryRepository, CompanyRepository
+from api.repository import CategoryRepository
 
 
 class CategoryCreateService:
