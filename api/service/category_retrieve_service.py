@@ -1,12 +1,15 @@
 import uuid
 
 from api.repository import CategoryRepository
+from api.repository.company_repository import CompanyRepository
 
 
 class CategoryRetrieveService:
 
-    def __init__(self, category_repository: CategoryRepository):
+    def __init__(self, category_repository: CategoryRepository, company_repository: CompanyRepository):
         self.category_repository = category_repository
+        self.company_repository = company_repository
 
     def handle(self, company_id: uuid.UUID, category_id: uuid.UUID):
-        return self.category_repository.find(company_id, category_id)
+        company = self.company_repository.get_by_id(company_id)
+        return self.category_repository.get(company.id, category_id)

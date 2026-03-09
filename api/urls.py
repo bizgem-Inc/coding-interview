@@ -13,6 +13,7 @@ urlpatterns = [
             "get": "list",
             "post": "create",
         }),
+        name="category-list",
     ),
     path(
         "companies/<uuid:company_id>/categories/<uuid:category_id>/",
@@ -21,5 +22,6 @@ urlpatterns = [
             "put": "update",
             "delete": "destroy"
         }),
+        name="category-detail",
     ),
 ]
