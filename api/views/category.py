@@ -41,7 +41,7 @@ class CategoryViewSet(ViewSet):
         serializer = CategorySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        category_create_service = CategoryCreateService(CategoryRepository())
+        category_create_service = CategoryCreateService(CategoryRepository(), CompanyRepository())
 
         try:
             category_create_service.handle(
@@ -50,11 +50,11 @@ class CategoryViewSet(ViewSet):
                 parent_category_id=serializer.validated_data.get("parent_category_id"),
             )
 
-        except NotFound as e:
-            raise Http404(str(e.detail))
+        except Company.DoesNotExist:
+            raise NotFound("Company not found")
 
-        except ValidationError as e:
-            return HttpResponseBadRequest(str(e.detail))
+        except Category.DoesNotExist:
+            raise NotFound("Parent category not found")
 
         return Response(status=status.HTTP_201_CREATED)
 

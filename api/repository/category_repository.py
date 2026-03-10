@@ -8,13 +8,13 @@ from api.models import Category
 class CategoryRepository:
 
     def find_by_company_id(self, company_id: uuid.UUID):
-        return Category.objects.filter(company_id = company_id).order_by("id")
+        return Category.objects.filter(company_id = company_id).order_by("created_at")
 
     def find(self, company_id: uuid.UUID, category_id: uuid.UUID):
         return Category.objects.filter(company_id=company_id, id = category_id).first()
 
     def get(self, company_id: uuid.UUID, category_id: uuid.UUID):
-        return Category.objects.get(company_id=company_id, id = category_id)
+        return Category.objects.get(company_id=company_id, id=category_id)
 
     def create(self, company_id: uuid.UUID, name: str, parent_category_id: uuid.UUID|None):
         return Category.objects.create(
