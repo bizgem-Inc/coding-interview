@@ -82,16 +82,16 @@ class CategoryViewSet(ViewSet):
 
     def destroy(self, request, company_id, category_id):
 
-        category_destroy_service = CategoryDestroyService(CategoryRepository())
+        category_destroy_service = CategoryDestroyService(CategoryRepository(), CompanyRepository())
 
         try:
             category_destroy_service.handle(company_id, category_id)
 
-        except NotFound as e:
-            raise Http404(str(e.detail))
+        except Company.DoesNotExist:
+            raise NotFound("Company not found")
 
-        except ValidationError as e:
-            return HttpResponseBadRequest(str(e.detail))
+        except Category.DoesNotExist:
+            raise NotFound("Category not found")
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
