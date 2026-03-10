@@ -252,7 +252,7 @@ class CategoryViewTests(APITestCase):
     新規作成のテスト
     バリデーションエラー カテゴリー名が空白
     """
-    def test_create_validation_error_name_is_none(self):
+    def test_create_name_is_none_validation_error(self):
         # Arrange
         company = Company.objects.create(name="company1")
 
@@ -273,7 +273,7 @@ class CategoryViewTests(APITestCase):
     新規作成のテスト
     バリデーションエラー カテゴリー名の文字数オーバー
     """
-    def test_create_validation_error_name(self):
+    def test_create_name_validation_error(self):
         # Arrange
         company = Company.objects.create(name="company1")
 
@@ -294,7 +294,7 @@ class CategoryViewTests(APITestCase):
     新規作成のテスト
     存在しない企業IDを指定した場合は404を返す
     """
-    def test_create_not_exist_company(self):
+    def test_create_not_exist_company_failure(self):
         # Arrange
         url = reverse("category-list", kwargs={"company_id": uuid.uuid4()})
         data = {
