@@ -419,3 +419,29 @@ class CategoryViewTests(APITestCase):
         # Assert
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["detail"], "Category not found")
+
+    """
+    削除のテスト
+    子カテゴリーをもつカテゴリーを削除できないこと
+    """
+    def test_destroy_has_children_category_failure(self):
+        # Arrange
+        company = Company.objects.create(name="company1")
+        parent_category = Category.objects.create(name="category1-1", company_id=company.id) # 削除対象
+        Category.objects.create(
+            name="category1-2",
+            company_id=company.id,
+            parent_category_id=parent_category.id
+        )
+
+        url = reverse("category-detail", kwargs={
+            "company_id": company.id,
+            "category_id": parent_category.id,
+        })
+
+        # Act
+        response = self.client.delete(url)
+
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["detail"], "Category has child categories")
