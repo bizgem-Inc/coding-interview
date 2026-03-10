@@ -335,5 +335,87 @@ class CategoryViewTests(APITestCase):
     def test_update(self):
         pass
 
-    def test_destroy(self):
-        pass
+    """
+    削除のテスト
+    企業のカテゴリーが削除できること
+    """
+    def test_destroy_success(self):
+        # Arrange
+        company = Company.objects.create(name="company1")
+        category = Category.objects.create(name="category1-1", company_id=company.id)
+
+        url = reverse("category-detail", kwargs={"company_id": company.id, "category_id": category.id})
+
+        # Act
+        response = self.client.delete(url)
+
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        self.assertEqual(Category.objects.count(), 0)
+
+    """
+    削除のテスト
+    他の企業のカテゴリーを指定した場合は404を返す
+    """
+    def test_destroy_category_of_another_company_failure(self):
+        # Arrange
+        company = Company.objects.create(name="company1")
+
+        another = Category.objects.create(name="category2-1", company_id=Company.objects.create(name="company2").id)
+
+        url = reverse("category-detail", kwargs={
+            "company_id": company.id,
+            "category_id": another.id, # 別の企業のカテゴリーを指定
+        })
+
+        # Act
+        response = self.client.delete(url)
+
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data["detail"], "Category not found")
+
+        self.assertEqual(Category.objects.count(), 1)
+
+    """
+    削除のテスト
+    存在しない企業IDを指定した場合は404を返す
+    """
+    def test_destroy_category_not_exist_company_failure(self):
+        # Arrange
+        company = Company.objects.create(name="company1")
+        category = Category.objects.create(name="category1-1", company_id=company.id)
+
+        url = reverse("category-detail", kwargs={
+            "company_id": uuid.uuid4(), # 存在しない企業を指定
+            "category_id": category.id,
+        })
+
+        # Act
+        response = self.client.delete(url)
+
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data["detail"], "Company not found")
+
+    """
+    削除のテスト
+    存在しないカテゴリーIDを指定した場合は404を返す
+    """
+    def test_destroy_category_not_exist_category_failure(self):
+        # Arrange
+        company = Company.objects.create(name="company1")
+        Category.objects.create(name="category1-1", company_id=company.id)
+
+        url = reverse("category-detail", kwargs={
+            "company_id": company.id,
+            "category_id": uuid.uuid4(), # 存在しないカテゴリーを指定
+        })
+
+        # Act
+        response = self.client.delete(url)
+
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data["detail"], "Category not found")
