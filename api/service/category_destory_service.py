@@ -17,6 +17,6 @@ class CategoryDestroyService:
         category =  self.category_repository.get(company.id, category_id)
 
         if self.category_repository.has_children(category.id):
-            raise ValidationError("Category has child categories")
+            raise ValidationError({"detail": "Category has child categories"})
 
         return self.category_repository.delete(category.id)
