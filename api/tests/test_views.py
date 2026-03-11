@@ -9,11 +9,12 @@ from api.models import Company, Category
 
 class CategoryViewTests(APITestCase):
 
-    """
-    一覧のテスト
-    企業のカテゴリーのみ取得できること
-    """
     def test_list_success(self):
+        """
+        一覧のテスト
+        企業のカテゴリーのみ取得できること
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         Category.objects.create(name="category1-1", company_id=company.id)
@@ -33,11 +34,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.data[0]["name"], "category1-1")
         self.assertEqual(response.data[1]["name"], "category1-2")
 
-    """
-    一覧のテスト
-    存在しない企業IDを指定した場合は404を返す
-    """
     def test_list_not_exist_company_failure(self):
+        """
+        一覧のテスト
+        存在しない企業IDを指定した場合は404を返す
+        """
+
         # Arrange
         url = reverse("category-list", kwargs={"company_id": uuid.uuid4()})
 
@@ -48,11 +50,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["detail"], "Company not found")
 
-    """
-    詳細のテスト
-    企業のカテゴリーが取得できること
-    """
     def test_retrieve_success(self):
+        """
+        詳細のテスト
+        企業のカテゴリーが取得できること
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)
@@ -75,11 +78,12 @@ class CategoryViewTests(APITestCase):
         self.assertIn("created_at", response.data)
         self.assertIn("updated_at", response.data)
 
-    """
-    詳細のテスト
-    他の企業のカテゴリーを指定した場合は404を返す
-    """
     def test_retrieve_category_of_another_company_failure(self):
+        """
+        詳細のテスト
+        他の企業のカテゴリーを指定した場合は404を返す
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         Category.objects.create(name="category1-1", company_id=company.id)
@@ -98,11 +102,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["detail"], "Category not found")
 
-    """
-    詳細のテスト
-    存在しない企業IDを指定した場合は404を返す
-    """
     def test_retrieve_category_not_exist_company_failure(self):
+        """
+        詳細のテスト
+        存在しない企業IDを指定した場合は404を返す
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)
@@ -119,11 +124,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["detail"], "Company not found")
 
-    """
-    詳細のテスト
-    存在しないカテゴリーIDを指定した場合は404を返す
-    """
     def test_retrieve_category_not_exist_category_failure(self):
+        """
+        詳細のテスト
+        存在しないカテゴリーIDを指定した場合は404を返す
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         Category.objects.create(name="category1-1", company_id=company.id)
@@ -140,12 +146,13 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["detail"], "Category not found")
 
-    """
-    新規作成のテスト
-    企業のカテゴリーが登録できること
-    親カテゴリーは null
-    """
     def test_create_success(self):
+        """
+        新規作成のテスト
+        企業のカテゴリーが登録できること
+        親カテゴリーは null
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
 
@@ -168,12 +175,13 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(new_category.company_id, company.id)
         self.assertIsNone(new_category.parent_category)
 
-    """
-    新規作成のテスト
-    企業のカテゴリーが登録できること
-    親カテゴリーがnullではない
-    """
     def test_create_store_parent_category_success(self):
+        """
+        新規作成のテスト
+        企業のカテゴリーが登録できること
+        親カテゴリーがnullではない
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)
@@ -197,11 +205,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(new_category.company_id, company.id)
         self.assertEqual(new_category.parent_category_id, category.id)
 
-    """
-    新規作成のテスト
-    カテゴリー名が重複しても、異なる企業だと登録できること
-    """
-    def test_create_duplicate_name_success(self):
+    def test_create_when_name_is_duplicated_in_another_company_success(self):
+        """
+        新規作成のテスト
+        カテゴリー名が重複しても、異なる企業だと登録できること
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
 
@@ -226,11 +235,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(new_category.company_id, company.id)
         self.assertIsNone(new_category.parent_category_id)
 
-    """
-    新規作成のテスト
-    同じ企業内でカテゴリー名が重複して登録できないこと
-    """
     def test_create_duplicate_name_failure(self):
+        """
+        新規作成のテスト
+        同じ企業内でカテゴリー名が重複して登録できないこと
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)
@@ -248,11 +258,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["detail"], "Category name already exists")
 
-    """
-    新規作成のテスト
-    バリデーションエラー カテゴリー名が空白
-    """
     def test_create_name_is_none_validation_error(self):
+        """
+        新規作成のテスト
+        バリデーションエラー カテゴリー名が空白
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
 
@@ -269,11 +280,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["name"][0], "This field may not be null.")
 
-    """
-    新規作成のテスト
-    バリデーションエラー カテゴリー名の文字数オーバー
-    """
     def test_create_name_validation_error(self):
+        """
+        新規作成のテスト
+        バリデーションエラー カテゴリー名の文字数オーバー
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
 
@@ -290,11 +302,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["name"][0], "Ensure this field has no more than 255 characters.")
 
-    """
-    新規作成のテスト
-    存在しない企業IDを指定した場合は404を返す
-    """
     def test_create_not_exist_company_failure(self):
+        """
+        新規作成のテスト
+        存在しない企業IDを指定した場合は404を返す
+        """
+
         # Arrange
         url = reverse("category-list", kwargs={"company_id": uuid.uuid4()})
         data = {
@@ -309,11 +322,13 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["detail"], "Company not found")
 
-    """
-    新規作成のテスト
-    親カテゴリーに他の企業のカテゴリーを指定した場合は404を返す
-    """
+
     def test_create_parent_category_of_another_company_failure(self):
+        """
+        新規作成のテスト
+        親カテゴリーに他の企業のカテゴリーを指定した場合は404を返す
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
 
@@ -332,12 +347,13 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["detail"], "Parent category not found")
 
-    """
-    更新のテスト
-    企業のカテゴリーが更新できること
-    親カテゴリーは null
-    """
     def test_update_success(self):
+        """
+        更新のテスト
+        企業のカテゴリーが更新できること
+        親カテゴリーは null
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)
@@ -361,12 +377,14 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(updated_category.company_id, company.id)
         self.assertIsNone(updated_category.parent_category)
 
-    """
-    更新のテスト
-    企業のカテゴリーが更新できること
-    親カテゴリーがnullではない
-    """
+
     def test_update_store_parent_category_success(self):
+        """
+        更新のテスト
+        企業のカテゴリーが更新できること
+        親カテゴリーがnullではない
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)  # 更新対象
@@ -391,11 +409,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(updated_category.company_id, company.id)
         self.assertEqual(updated_category.parent_category_id, parent_category.id)
 
-    """
-    更新のテスト
-    カテゴリー名が重複しても、異なる企業だと登録できること
-    """
-    def test_update_duplicate_name_success(self):
+    def test_update_when_name_is_duplicated_in_another_company_success(self):
+        """
+        更新のテスト
+        カテゴリー名が重複しても、異なる企業だと登録できること
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)  # 更新対象
@@ -421,11 +440,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(new_category.company_id, company.id)
         self.assertIsNone(new_category.parent_category_id)
 
-    """
-    更新のテスト
-    同じ企業内でカテゴリー名が重複して登録できないこと
-    """
     def test_update_duplicate_name_failure(self):
+        """
+        更新のテスト
+        同じ企業内でカテゴリー名が重複して登録できないこと
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)  # 更新対象
@@ -444,11 +464,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["detail"], "Category name already exists")
 
-    """
-    更新のテスト
-    バリデーションエラー カテゴリー名が空白
-    """
     def test_update_name_is_none_validation_error(self):
+        """
+        更新のテスト
+        バリデーションエラー カテゴリー名が null
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)  # 更新対象
@@ -466,11 +487,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["name"][0], "This field may not be null.")
 
-    """
-    更新のテスト
-    バリデーションエラー カテゴリー名の文字数オーバー
-    """
     def test_update_name_validation_error(self):
+        """
+        更新のテスト
+        バリデーションエラー カテゴリー名の文字数オーバー
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)  # 更新対象
@@ -488,11 +510,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["name"][0], "Ensure this field has no more than 255 characters.")
 
-    """
-    更新のテスト
-    存在しない企業IDを指定した場合は404を返す
-    """
     def test_update_not_exist_company_failure(self):
+        """
+        更新のテスト
+        存在しない企業IDを指定した場合は404を返す
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)
@@ -510,11 +533,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["detail"], "Company not found")
 
-    """
-    更新のテスト
-    存在しないカテゴリーIDを指定した場合は404を返す
-    """
     def test_update_not_exist_category_failure(self):
+        """
+        更新のテスト
+        存在しないカテゴリーIDを指定した場合は404を返す
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
 
@@ -531,11 +555,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["detail"], "Category not found")
 
-    """
-    更新のテスト
-    他の企業のカテゴリーを指定した場合は404を返す
-    """
     def test_update_parent_category_of_another_company_failure(self):
+        """
+        更新のテスト
+        他の企業のカテゴリーを指定した場合は404を返す
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
 
@@ -554,11 +579,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["detail"], "Category not found")
 
-    """
-    更新のテスト
-    自分自身を親カテゴリーに指定して更新できないこと
-    """
     def test_update_category_with_itself_as_parent_failure(self):
+        """
+        更新のテスト
+        自分自身を親カテゴリーに指定して更新できないこと
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)
@@ -576,11 +602,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["detail"], "Category cannot be its own parent")
 
-    """
-    更新のテスト
-    他の企業のカテゴリーを親カテゴリー指定した場合は404を返す
-    """
     def test_update_with_parent_category_of_another_company_failure(self):
+        """
+        更新のテスト
+        他の企業のカテゴリーを親カテゴリー指定した場合は404を返す
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)
@@ -600,11 +627,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["detail"], "Parent category not found")
 
-    """
-    更新のテスト
-    循環参照のテスト 子カテゴリーを親カテゴリーに指定した場合は更新できないこと
-    """
     def test_update_with_descendant_as_parent_failure(self):
+        """
+        更新のテスト
+        循環参照のテスト 子カテゴリーを親カテゴリーに指定した場合は更新できないこと
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
 
@@ -637,11 +665,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["detail"], "Cycle detected")
 
-    """
-    削除のテスト
-    企業のカテゴリーが削除できること
-    """
     def test_destroy_success(self):
+        """
+        削除のテスト
+        企業のカテゴリーが削除できること
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)
@@ -656,11 +685,12 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(Category.objects.count(), 0)
 
-    """
-    削除のテスト
-    他の企業のカテゴリーを指定した場合は404を返す
-    """
     def test_destroy_category_of_another_company_failure(self):
+        """
+        削除のテスト
+        他の企業のカテゴリーを指定した場合は404を返す
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
 
@@ -680,11 +710,12 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(Category.objects.count(), 1)
 
-    """
-    削除のテスト
-    存在しない企業IDを指定した場合は404を返す
-    """
     def test_destroy_category_not_exist_company_failure(self):
+        """
+        削除のテスト
+        存在しない企業IDを指定した場合は404を返す
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         category = Category.objects.create(name="category1-1", company_id=company.id)
@@ -703,11 +734,12 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(Category.objects.count(), 1)
 
-    """
-    削除のテスト
-    存在しないカテゴリーIDを指定した場合は404を返す
-    """
     def test_destroy_category_not_exist_category_failure(self):
+        """
+        削除のテスト
+        存在しないカテゴリーIDを指定した場合は404を返す
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         Category.objects.create(name="category1-1", company_id=company.id)
@@ -726,11 +758,12 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(Category.objects.count(), 1)
 
-    """
-    削除のテスト
-    子カテゴリーをもつカテゴリーを削除できないこと
-    """
     def test_destroy_has_children_category_failure(self):
+        """
+        削除のテスト
+        子カテゴリーをもつカテゴリーを削除できないこと
+        """
+
         # Arrange
         company = Company.objects.create(name="company1")
         parent_category = Category.objects.create(name="category1-1", company_id=company.id) # 削除対象
