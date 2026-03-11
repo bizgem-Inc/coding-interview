@@ -43,7 +43,7 @@ class CategoryRepository:
 
         return not query.exists()
 
-    def is_descendant(self, category_id: uuid.UUID, parent_category_id: uuid.UUID):
+    def is_descendant(self, category_id: uuid.UUID, new_parent_category_id: uuid.UUID):
         query = """
                 WITH RECURSIVE ancestors AS (
                     SELECT id, parent_category_id
@@ -59,11 +59,10 @@ class CategoryRepository:
                 )
                 SELECT 1
                 FROM ancestors
-                WHERE parent_category_id = %s
-                    LIMIT 1 \
+                WHERE id = %s
+                LIMIT 1
                 """
 
         with connection.cursor() as cursor:
-            cursor.execute(query, [category_id, parent_category_id])
+            cursor.execute(query, [new_parent_category_id, category_id])
             return cursor.fetchone() is not None
-
