@@ -28,7 +28,7 @@ class CategoryUpdateService:
             if parent_category is None:
                 raise NotFound("Parent category not found")
 
-            if self.category_repository.is_descendant(category_id, parent_category_id):
+            if self.category_repository.would_create_cycle(category_id, parent_category_id):
                 raise ValidationError({"detail": "Cycle detected"})
 
         if not self.category_repository.is_unique(company_id, name, category_id):

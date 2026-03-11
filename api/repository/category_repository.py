@@ -43,7 +43,15 @@ class CategoryRepository:
 
         return not query.exists()
 
-    def is_descendant(self, category_id: uuid.UUID, new_parent_category_id: uuid.UUID):
+
+    def would_create_cycle(self, category_id: uuid.UUID, new_parent_category_id: uuid.UUID):
+        """
+        カテゴリの親を変更した際に循環参照になるかを確認する。
+        
+        :param category_id: 親を変更する対象のカテゴリID
+        :param new_parent_category_id: 新しく設定しようとしている親カテゴリID
+        :return: 循環参照になる場合は True、ならない場合は False
+        """
         query = """
                 WITH RECURSIVE ancestors AS (
                     SELECT id, parent_category_id
