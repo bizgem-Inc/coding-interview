@@ -608,7 +608,7 @@ class CategoryViewTests(APITestCase):
         # Arrange
         company = Company.objects.create(name="company1")
 
-        parent = Category.objects.create(
+        parent = Category.objects.create(  # 更新対象
             name="category1",
             company_id=company.id,
             parent_category_id=None,
@@ -618,7 +618,7 @@ class CategoryViewTests(APITestCase):
             company_id=company.id,
             parent_category_id=parent.id,
         )
-        grandchild = Category.objects.create(
+        grandchild = Category.objects.create(  # 子カテゴリーに指定する対象
             name="category3",
             company_id=company.id,
             parent_category_id=child.id,
@@ -627,7 +627,7 @@ class CategoryViewTests(APITestCase):
         url = reverse("category-detail", kwargs={"company_id": company.id, "category_id": parent.id})
         data = {
             "name": "category1",
-            "parent_category_id": grandchild.id,
+            "parent_category_id": grandchild.id, # 子カテゴリーに自分の子孫カテゴリーを指定
         }
 
         # Act
