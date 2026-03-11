@@ -1,12 +1,11 @@
-from django.http import Http404, HttpResponseBadRequest
+from django.http import Http404
 from rest_framework import status
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from api.models import Company, Category
-from api.repository import CategoryRepository
-from api.repository.company_repository import CompanyRepository
+from api.repository import CategoryRepository, CompanyRepository
 from api.serializers import CategorySerializer
 from api.service import CategoryListService, CategoryRetrieveService, CategoryDestroyService, CategoryCreateService, \
     CategoryUpdateService

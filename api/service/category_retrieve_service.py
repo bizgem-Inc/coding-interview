@@ -1,7 +1,6 @@
 import uuid
 
-from api.repository import CategoryRepository
-from api.repository.company_repository import CompanyRepository
+from api.repository import CategoryRepository, CompanyRepository
 
 
 class CategoryRetrieveService:

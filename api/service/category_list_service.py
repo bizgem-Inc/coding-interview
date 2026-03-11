@@ -1,9 +1,6 @@
 import uuid
 
-from rest_framework.exceptions import NotFound
-
-from api.repository import CategoryRepository
-from api.repository.company_repository import CompanyRepository
+from api.repository import CategoryRepository, CompanyRepository
 
 
 class CategoryListService:
