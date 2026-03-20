@@ -16,6 +16,16 @@ class Category(models.Model):
 
     def clean(self):
         super().clean()
+
+        # 子カテゴリが存在する場合、company の変更を禁止する
+        # (子カテゴリが別会社の親を参照する状態になるため)
+        if self.pk and Category.objects.filter(parent_category=self).exists():
+            original_company_id = Category.objects.get(pk=self.pk).company_id
+            if original_company_id != self.company_id:
+                raise ValidationError(
+                    {"company": "Cannot change company because this category has child categories."}
+                )
+
         if self.parent_category is None:
             return
 
