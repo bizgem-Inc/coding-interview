@@ -58,7 +58,7 @@ class CategoryViewTests(APITestCase):
         response = self.client.post(url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["parent_category"], str(parent.id))
+        self.assertEqual(str(response.data["parent_category"]), str(parent.id))
 
     def test_create_without_required_fields_fails(self):
         """作成: company や name なしでは作成できないこと（バリデーション）"""
