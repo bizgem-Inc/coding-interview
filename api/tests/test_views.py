@@ -1,18 +1,51 @@
+from rest_framework import status
 from rest_framework.test import APITestCase
+
+from api.models.category import Category
+from api.models.company import Company
 
 
 class CategoryViewTests(APITestCase):
+    def setUp(self):
+        self.company = Company.objects.create(name="テスト企業")
+        self.category = Category.objects.create(
+            company=self.company,
+            name="テストカテゴリ",
+        )
+
     def test_list(self):
-        pass
+        response = self.client.get("/api/categories/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
 
     def test_retrieve(self):
-        pass
+        response = self.client.get(f"/api/categories/{self.category.id}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["name"], "テストカテゴリ")
+
+    def test_retrieve_not_found(self):
+        response = self.client.get("/api/categories/00000000-0000-0000-0000-000000000000/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create(self):
-        pass
+        data = {"company": str(self.company.id), "name": "新カテゴリ"}
+        response = self.client.post("/api/categories/", data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Category.objects.count(), 2)
+
+    def test_create_duplicate_name(self):
+        data = {"company": str(self.company.id), "name": "テストカテゴリ"}
+        response = self.client.post("/api/categories/", data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update(self):
-        pass
+        data = {"company": str(self.company.id), "name": "更新カテゴリ"}
+        response = self.client.put(f"/api/categories/{self.category.id}/", data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.category.refresh_from_db()
+        self.assertEqual(self.category.name, "更新カテゴリ")
 
     def test_destroy(self):
-        pass
+        response = self.client.delete(f"/api/categories/{self.category.id}/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Category.objects.count(), 0)
