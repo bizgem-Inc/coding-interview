@@ -39,6 +39,10 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Category.objects.filter(company=self.company, name="Books").exists())
 
+        duplicate_payload = {"company": str(self.company.id), "name": "General", "parent_category": None}
+        duplicate_response = self.client.post(self.list_url, duplicate_payload, format="json")
+        self.assertEqual(duplicate_response.status_code, status.HTTP_400_BAD_REQUEST)
+
         invalid_payload = {"company": str(self.company.id), "name": "   "}
         invalid_response = self.client.post(self.list_url, invalid_payload, format="json")
         self.assertEqual(invalid_response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -64,6 +68,11 @@ class CategoryViewTests(APITestCase):
         invalid_payload = {"parent_category": str(self.category.id)}
         invalid_response = self.client.patch(self.detail_url, invalid_payload, format="json")
         self.assertEqual(invalid_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        other_company_parent = Category.objects.create(company=self.other_company, name="Other Parent")
+        cross_company_payload = {"parent_category": str(other_company_parent.id)}
+        cross_company_response = self.client.patch(self.detail_url, cross_company_payload, format="json")
+        self.assertEqual(cross_company_response.status_code, status.HTTP_400_BAD_REQUEST)
 
         other_company_parent = Category.objects.create(company=self.other_company, name="Other Company Parent")
         company_mismatch_payload = {"parent_category": str(other_company_parent.id)}
