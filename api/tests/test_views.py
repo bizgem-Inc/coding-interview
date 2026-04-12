@@ -39,17 +39,15 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Category.objects.filter(company=self.company, name="Books").exists())
 
-        duplicate_payload = {"company": str(self.company.id), "name": "General", "parent_category": None}
-        duplicate_response = self.client.post(self.list_url, duplicate_payload, format="json")
-        self.assertEqual(duplicate_response.status_code, status.HTTP_400_BAD_REQUEST)
-
         invalid_payload = {"company": str(self.company.id), "name": "   "}
         invalid_response = self.client.post(self.list_url, invalid_payload, format="json")
         self.assertEqual(invalid_response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        duplicate_payload = {"company": str(self.company.id), "name": self.category.name}
-        duplicate_response = self.client.post(self.list_url, duplicate_payload, format="json")
-        self.assertEqual(duplicate_response.status_code, status.HTTP_400_BAD_REQUEST)
+    def test_create_duplicate_name_returns_400(self):
+        duplicate_payload = {"company": str(self.company.id), "name": self.category.name, "parent_category": None}
+        response = self.client.post(self.list_url, duplicate_payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update(self):
         parent = Category.objects.create(company=self.company, name="Parent")
@@ -69,15 +67,12 @@ class CategoryViewTests(APITestCase):
         invalid_response = self.client.patch(self.detail_url, invalid_payload, format="json")
         self.assertEqual(invalid_response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_update_cross_company_parent_returns_400(self):
         other_company_parent = Category.objects.create(company=self.other_company, name="Other Parent")
-        cross_company_payload = {"parent_category": str(other_company_parent.id)}
-        cross_company_response = self.client.patch(self.detail_url, cross_company_payload, format="json")
-        self.assertEqual(cross_company_response.status_code, status.HTTP_400_BAD_REQUEST)
+        payload = {"parent_category": str(other_company_parent.id)}
+        response = self.client.patch(self.detail_url, payload, format="json")
 
-        other_company_parent = Category.objects.create(company=self.other_company, name="Other Company Parent")
-        company_mismatch_payload = {"parent_category": str(other_company_parent.id)}
-        company_mismatch_response = self.client.patch(self.detail_url, company_mismatch_payload, format="json")
-        self.assertEqual(company_mismatch_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_destroy(self):
         response = self.client.delete(self.detail_url)
