@@ -44,6 +44,10 @@ class CategoryAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         categories = response.data["categories"]
         
+        print(f"\n[Test: List Tree Structure]")
+        print(f"  Expected: A nested tree starting with 'A_Root'")
+        print(f"  Actual JSON Tree:\n    {categories}")
+
         # A_Rootが1つあり、その中に子がネストされていることを確認
         self.assertEqual(len(categories), 1)
         root = categories[0]
@@ -63,6 +67,10 @@ class CategoryAPITests(APITestCase):
         }
         response = self.client.post(url, data, format='json')
 
+        print(f"\n[Test: Create with Computed Fields]")
+        print(f"  Input: Parent ID is 'A_Child_1'")
+        print(f"  Actual Result: parent_name='{response.data['parent_category_name']}', depth={response.data['depth']}")
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["parent_category_name"], "A_Child_1")
         self.assertEqual(response.data["depth"], 2) # Root(0) -> Child(1) -> New(2)
@@ -76,6 +84,10 @@ class CategoryAPITests(APITestCase):
         # Rootの親を、自分の孫（A_GrandChild_1）に設定しようとする
         data = {"parent_category_id": str(self.cat_a_grandchild_1.id)}
         response = self.client.patch(url, data, format='json')
+
+        print(f"\n[Test: Circular Reference Protection]")
+        print(f"  Action: Set Root's parent to its own GrandChild")
+        print(f"  Actual Error: {response.data}")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("Circular reference detected", str(response.data))
@@ -99,6 +111,10 @@ class CategoryAPITests(APITestCase):
             kwargs={"company_id": self.company_a.id, "category_id": self.cat_a_root.id}
         )
         response = self.client.delete(url)
+
+        print(f"\n[Test: Enhanced Delete Validation]")
+        print(f"  Action: Delete 'A_Root' which has children")
+        print(f"  Actual blocking_child_ids: {response.data.get('blocking_child_ids')}")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["detail"], "Cannot delete category with children.")
