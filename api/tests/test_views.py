@@ -21,6 +21,11 @@ class CategoryViewTests(APITestCase):
             parent_category=self.parent_category,
         )
 
+    def assert_field_error(self, response, field, message):
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(field, response.data)
+        self.assertEqual(response.data[field][0], message)
+
     def test_list(self):
         url = reverse("category-list")
         response = self.client.get(url)
@@ -87,7 +92,11 @@ class CategoryViewTests(APITestCase):
         }
         response = self.client.post(url, data, format="json")
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assert_field_error(
+            response,
+            "name",
+            "A category with this name already exists for this company.",
+        )
 
     def test_create_with_unknown_company_returns_bad_request(self):
         url = reverse("category-list")
@@ -98,6 +107,8 @@ class CategoryViewTests(APITestCase):
         response = self.client.post(url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("company", response.data)
+        self.assertIn("does not exist", response.data["company"][0])
 
     def test_create_with_unknown_parent_category_returns_bad_request(self):
         url = reverse("category-list")
@@ -109,6 +120,8 @@ class CategoryViewTests(APITestCase):
         response = self.client.post(url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("parent_category", response.data)
+        self.assertIn("does not exist", response.data["parent_category"][0])
 
     def test_create_with_parent_category_from_other_company_returns_bad_request(self):
         other_company = Company.objects.create(name="Other Company")
@@ -124,7 +137,11 @@ class CategoryViewTests(APITestCase):
         }
         response = self.client.post(url, data, format="json")
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assert_field_error(
+            response,
+            "parent_category",
+            "Parent category must belong to the same company.",
+        )
 
     def test_update_with_self_parent_category_returns_bad_request(self):
         url = reverse("category-detail", kwargs={"pk": self.category.id})
@@ -135,7 +152,11 @@ class CategoryViewTests(APITestCase):
         }
         response = self.client.put(url, data, format="json")
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assert_field_error(
+            response,
+            "parent_category",
+            "A category cannot be its own parent.",
+        )
 
     def test_update_with_descendant_parent_category_returns_bad_request(self):
         child_category = Category.objects.create(
@@ -151,4 +172,8 @@ class CategoryViewTests(APITestCase):
         }
         response = self.client.put(url, data, format="json")
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assert_field_error(
+            response,
+            "parent_category",
+            "A category cannot use its descendant as parent.",
+        )
