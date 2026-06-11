@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: coding-interview
+Version: 0.1.0
+Summary: Coding interview project
+Requires-Python: >=3.11
+Requires-Dist: django==4.2.4
+Requires-Dist: djangorestframework==3.14.0
+Requires-Dist: psycopg2-binary==2.9.12
+Provides-Extra: dev

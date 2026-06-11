@@ -44,3 +44,7 @@ venv.bak/
 static/
 
 .DS_Store
+
+# uv
+uv.lock
+.mypy_cache/
