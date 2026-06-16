@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from api.models import Category
+from api.serializers.company import CompanySerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -15,3 +16,8 @@ class CategorySerializer(serializers.ModelSerializer):
                 fields=["company", "name"],
             )
         ]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["company"] = CompanySerializer(instance.company).data
+        return representation

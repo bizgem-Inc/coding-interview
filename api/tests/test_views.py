@@ -52,7 +52,8 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         body = response.json()
-        self.assertEqual(body["company"], str(self.company.id))
+        self.assertEqual(body["company"]["id"], str(self.company.id))
+        self.assertEqual(body["company"]["name"], self.company.name)
         self.assertEqual(body["name"], "カテゴリA")
         self.assertIsNone(body["parent_category"])
         self.assertTrue(Category.objects.filter(id=body["id"]).exists())
