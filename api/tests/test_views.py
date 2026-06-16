@@ -236,5 +236,3 @@ class CategoryViewTests(APITestCase):
         response = self.client.delete("/api/categories/00000000-0000-0000-0000-000000000000/")
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    # TODO: 異常系: 存在しないカテゴリ削除は404エラー
