@@ -1,0 +1,27 @@
+services:
+  webapi:
+    build: docker/webapi
+    volumes:
+      - .:/usr/src/app
+      - python-packages:/root/.local/share
+    command: make run
+    environment:
+      DB_HOST_NAME: postgres
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:18.4
+    volumes:
+       - postgres_data:/var/lib/postgresql:delegated
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: coding-test
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+  python-packages:
