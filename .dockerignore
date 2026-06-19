@@ -1,0 +1,9 @@
+.git
+.venv
+__pycache__
+*.pyc
+*.log
+.pytest_cache
+.mypy_cache
+db.sqlite3
+server*.log
