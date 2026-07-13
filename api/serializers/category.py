@@ -41,6 +41,7 @@ class CategorySerializer(serializers.ModelSerializer):
         if not value:
             return value
 
+        # 循環参照チェック
         if self.instance and value.id == self.instance.id:
             raise serializers.ValidationError("Cannot set itself as a parent category.")
 
