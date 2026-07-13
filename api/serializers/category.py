@@ -27,6 +27,7 @@ class CategorySerializer(serializers.ModelSerializer):
         ]
 
     def validate_company(self, value):
+        # NOTE: read_only_fieldsにcompanyを含めると、UniqueTogetheValidatorが正しく機能しないため個別にバリデーションを行う
         if not self.instance:
             return value
 
