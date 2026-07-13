@@ -178,7 +178,7 @@ class CategoryViewTests(APITestCase):
         category_b = Category.objects.create(company=self.company, name="B", parent_category=category_a)
         category_c = Category.objects.create(company=self.company, name="C", parent_category=category_b)
 
-        # モデルのsave時にエラーとなるため、QuerySet.updateで強制的にループ(C -> A)を作り出す
+        # DBに直接不正な状態（C -> Aのループ）を作り出す
         Category.objects.filter(id=category_a.id).update(parent_category=category_c)
 
         # 既存のカテゴリ(self.category)の親を、ループしているツリー(category_a)に設定しようとする
@@ -188,7 +188,6 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("parent_category", response.data)
-        # category_a -> category_c -> category_b -> category_a と辿るため、ループ検知はcategory_aが対象
         self.assertEqual(
             response.data["parent_category"][0],
             "Circular reference detected."
