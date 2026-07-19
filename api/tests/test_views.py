@@ -9,7 +9,8 @@ class CategoryViewTests(APITestCase):
         self.category = Category.objects.create(company=self.company, name="Engineering")
 
     def test_list(self):
-        response = self.client.get("/api/categories/")
+        with self.assertNumQueries(1):
+            response = self.client.get("/api/categories/")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]["id"], str(self.category.id))

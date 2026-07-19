@@ -9,6 +9,7 @@ djangorestframework = "==3.14.0"
 psycopg2 = "==2.9.12"
 
 [dev-packages]
+hypothesis = "==6.155.0"
 
 [requires]
 python_version = "3.11"
