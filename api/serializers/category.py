@@ -14,6 +14,9 @@ class CategorySerializer(serializers.ModelSerializer):
         name = attrs.get("name", getattr(self.instance, "name", None))
         parent_category = attrs.get("parent_category", getattr(self.instance, "parent_category", None))
 
+        if "\x00" in name:
+            raise serializers.ValidationError({"name": "NUL文字は使用できません。"})
+
         duplicate_categories = Category.objects.filter(company=company, name=name)
         if self.instance is not None:
             duplicate_categories = duplicate_categories.exclude(id=self.instance.id)

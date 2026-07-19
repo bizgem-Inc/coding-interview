@@ -1,7 +1,13 @@
+from datetime import datetime
+from unittest.mock import Mock
+
+from django.db import IntegrityError
 from rest_framework import status
+from rest_framework.exceptions import ValidationError as RestValidationError
 from rest_framework.test import APITestCase
 
 from api.models import Category, Company
+from api.views.category import CategoryViewSet
 
 
 class CategoryValidationTests(APITestCase):
@@ -17,6 +23,7 @@ class CategoryValidationTests(APITestCase):
             ({"company": str(self.company.id)}, "name"),
             ({"company": str(self.company.id), "name": ""}, "name"),
             ({"company": str(self.company.id), "name": "x" * 256}, "name"),
+            ({"company": str(self.company.id), "name": "Invalid\x00Name"}, "name"),
             ({"company": "00000000-0000-0000-0000-000000000000", "name": "Product"}, "company"),
             ({"company": str(self.company.id), "name": "Product", "parent_category": "00000000-0000-0000-0000-000000000000"}, "parent_category"),
         ]
@@ -75,6 +82,17 @@ class CategoryValidationTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("non_field_errors", response.data)
 
+    def test_unique_constraint_race_is_converted_to_a_validation_error(self):
+        database_error = IntegrityError()
+        cause = Exception()
+        cause.diag = type("Diagnostic", (), {"constraint_name": "unique_company_category_combination"})()
+        database_error.__cause__ = cause
+        serializer = Mock()
+        serializer.save.side_effect = database_error
+
+        with self.assertRaises(RestValidationError):
+            CategoryViewSet._save_serializer(serializer)
+
     def test_patch_rejects_self_and_cyclic_parent_references(self):
         child = Category.objects.create(company=self.company, name="Child", parent_category=self.category)
 
@@ -106,3 +124,14 @@ class CategoryValidationTests(APITestCase):
         self.company.delete()
 
         self.assertFalse(Category.objects.filter(id=category_id).exists())
+
+    def test_retrieve_response_has_the_documented_json_shape(self):
+        response = self.client.get(f"/api/categories/{self.category.id}/")
+        payload = response.json()
+
+        self.assertEqual(response["Content-Type"], "application/json")
+        self.assertEqual(payload["id"], str(self.category.id))
+        self.assertEqual(payload["company"], str(self.company.id))
+        self.assertEqual(payload["parent_category"], str(self.parent.id))
+        datetime.fromisoformat(payload["created_at"].replace("Z", "+00:00"))
+        datetime.fromisoformat(payload["updated_at"].replace("Z", "+00:00"))
