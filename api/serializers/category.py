@@ -16,6 +16,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
         if "\x00" in name:
             raise serializers.ValidationError({"name": "NUL文字は使用できません。"})
+        if any(0xD800 <= ord(character) <= 0xDFFF for character in name):
+            raise serializers.ValidationError({"name": "単独のサロゲート文字は使用できません。"})
 
         duplicate_categories = Category.objects.filter(company=company, name=name)
         if self.instance is not None:

@@ -39,6 +39,30 @@ class CategoryValidationTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_rejects_an_unpaired_surrogate(self):
+        payload = f'{{"company": "{self.company.id}", "name": "Invalid\\uD800Name"}}'
+
+        response = self.client.post("/api/categories/", payload, content_type="application/json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("name", response.data)
+
+    def test_create_and_retrieve_preserves_japanese_and_emoji_at_maximum_length(self):
+        prefix = "カテゴリ😀👨‍👩‍👧‍👦"
+        name = prefix + "あ" * (255 - len(prefix))
+
+        self.assertEqual(len(name), 255)
+        create_response = self.client.post(
+            "/api/categories/",
+            {"company": str(self.company.id), "name": name},
+            format="json",
+        )
+        retrieve_response = self.client.get(f"/api/categories/{create_response.data['id']}/")
+
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(retrieve_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(retrieve_response.json()["name"], name)
+
     def test_create_rejects_a_parent_from_another_company(self):
         foreign_parent = Category.objects.create(company=self.other_company, name="Foreign Parent")
 
