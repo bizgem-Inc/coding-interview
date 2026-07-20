@@ -19,4 +19,4 @@ class Category(models.Model):
         verbose_name = "category"
         verbose_name_plural = "categories"
         constraints = [models.UniqueConstraint(fields=["company", "name"], name="unique_company_category_combination")]
-        indexes = [models.Index(fields=["company", "name"])]
+        indexes = [models.Index(fields=["company", "name"])] # 既にユニーク制約があるため冗長かもしれません
