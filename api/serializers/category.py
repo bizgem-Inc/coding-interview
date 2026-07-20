@@ -5,6 +5,20 @@ from api.models import Category
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    def validate(self, attrs):
+        company = self.instance.company if self.instance else attrs.get("company")
+        parent = attrs.get("parent_category")
+        if parent is not None and parent.company_id != company.id:
+            raise serializers.ValidationError(
+                {"parent_category": "親カテゴリは同じ会社に属している必要があります。"}
+            )
+        return attrs
+
+    def validate_company(self, value):
+        if self.instance is not None and value != self.instance.company:
+            raise serializers.ValidationError("company は作成後に変更できません。")
+        return value
+
     def validate_parent_category(self, value):
         if value is None:
             return value
