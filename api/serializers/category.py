@@ -25,6 +25,19 @@ class CategorySerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
+        if (
+            self.instance
+            and "company" in attrs
+            and attrs["company"].pk != self.instance.company_id
+        ):
+            raise serializers.ValidationError(
+                {
+                    "company": (
+                        "カテゴリが属する企業を変更することはできません。"
+                    )
+                }
+            )
+
         company = attrs.get(
             "company",
             self.instance.company if self.instance else None,

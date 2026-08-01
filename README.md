@@ -74,7 +74,7 @@ Categoryのリクエスト項目は以下のとおりです。
 
 | 項目 | 必須 | 説明 |
 | --- | --- | --- |
-| `company` | 必須 | Categoryが属するCompanyのUUID |
+| `company` | 必須 | Categoryが属するCompanyのUUID。作成後は変更不可 |
 | `name` | 必須 | カテゴリ名 |
 | `parent_category` | 任意 | 親CategoryのUUID。親を持たない場合は省略または`null` |
 

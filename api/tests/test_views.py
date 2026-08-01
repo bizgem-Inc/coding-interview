@@ -232,20 +232,24 @@ class CategoryViewTests(APITestCase):
         self.category.refresh_from_db()
         self.assertEqual(self.category.parent_category, self.parent)
 
-    def test_update_rejects_company_different_from_parent_category(self):
-        """親カテゴリと異なる企業へ変更できないこと。"""
+    def test_update_rejects_company_change(self):
+        """Categoryが属するCompanyを別のCompanyへ変更できないこと。"""
         another_company = Company.objects.create(name="別企業")
 
         response = self.client.patch(
-            reverse("category-detail", kwargs={"pk": self.category.pk}),
+            reverse("category-detail", kwargs={"pk": self.parent.pk}),
             {"company": str(another_company.pk)},
             format="json",
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            str(response.data["company"][0]),
+            "カテゴリが属する企業を変更することはできません。",
+        )
 
-        self.category.refresh_from_db()
-        self.assertEqual(self.category.company, self.company)
+        self.parent.refresh_from_db()
+        self.assertEqual(self.parent.company, self.company)
 
     def test_destroy(self):
         response = self.client.delete(
