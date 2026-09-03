@@ -4,7 +4,7 @@ from django.test import TestCase
 from rest_framework.exceptions import ValidationError
 
 from api.models import Category, Company
-from api.validators import NoCircularParentCategory, ParentCategoryInSameCompany
+from api.validators import NoCircularParentCategoryValidator, SameCompanyParentCategoryValidator
 
 
 def serializer_for(instance=None):
@@ -12,9 +12,9 @@ def serializer_for(instance=None):
     return SimpleNamespace(instance=instance)
 
 
-class ParentCategoryInSameCompanyTests(TestCase):
+class SameCompanyParentCategoryValidatorTests(TestCase):
     def setUp(self):
-        self.validator = ParentCategoryInSameCompany()
+        self.validator = SameCompanyParentCategoryValidator()
         self.company = Company.objects.create(name="テスト企業")
         self.other_company = Company.objects.create(name="別企業")
         self.parent = Category.objects.create(company=self.company, name="食品")
@@ -48,9 +48,9 @@ class ParentCategoryInSameCompanyTests(TestCase):
             self.validator({"company": self.other_company}, serializer_for(child))
 
 
-class NoCircularParentCategoryTests(TestCase):
+class NoCircularParentCategoryValidatorTests(TestCase):
     def setUp(self):
-        self.validator = NoCircularParentCategory()
+        self.validator = NoCircularParentCategoryValidator()
         company = Company.objects.create(name="テスト企業")
         self.root = Category.objects.create(company=company, name="食品")
         self.child = Category.objects.create(company=company, name="菓子", parent_category=self.root)

@@ -8,7 +8,7 @@ def _effective_value(attrs, serializer, field):
     return getattr(serializer.instance, field, None)
 
 
-class ParentCategoryInSameCompany:
+class SameCompanyParentCategoryValidator:
     """親カテゴリは同じ企業に属していなければならない"""
 
     requires_context = True
@@ -23,7 +23,7 @@ class ParentCategoryInSameCompany:
             raise ValidationError({"parent_category": self.message})
 
 
-class NoCircularParentCategory:
+class NoCircularParentCategoryValidator:
     """自分自身や自分の子孫を親にしてはならない（更新時のみ成立しうる）"""
 
     requires_context = True

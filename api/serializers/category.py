@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from api.models import Category
-from api.validators import NoCircularParentCategory, ParentCategoryInSameCompany
+from api.validators import NoCircularParentCategoryValidator, SameCompanyParentCategoryValidator
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -17,6 +17,6 @@ class CategorySerializer(serializers.ModelSerializer):
                 fields=["company", "name"],
                 message="同じ企業内に同名のカテゴリが既に存在します。",
             ),
-            ParentCategoryInSameCompany(),
-            NoCircularParentCategory(),
+            SameCompanyParentCategoryValidator(),
+            NoCircularParentCategoryValidator(),
         ]
