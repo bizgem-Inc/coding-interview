@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from api.models import Category
+from api.validators import NoCircularParentCategory, ParentCategoryInSameCompany
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -15,31 +16,7 @@ class CategorySerializer(serializers.ModelSerializer):
                 queryset=Category.objects.all(),
                 fields=["company", "name"],
                 message="同じ企業内に同名のカテゴリが既に存在します。",
-            )
+            ),
+            ParentCategoryInSameCompany(),
+            NoCircularParentCategory(),
         ]
-
-    def validate(self, attrs):
-        # PATCH では attrs に含まれないフィールドがあるため、既存インスタンスの値で補う
-        instance = self.instance
-        company = attrs.get("company", getattr(instance, "company", None))
-        parent = attrs.get("parent_category", getattr(instance, "parent_category", None))
-
-        if parent is None:
-            return attrs
-
-        if parent.company_id != company.id:
-            raise serializers.ValidationError({"parent_category": "親カテゴリは同じ企業のカテゴリを指定してください。"})
-
-        if instance is not None:
-            self._validate_no_cycle(instance, parent)
-
-        return attrs
-
-    @staticmethod
-    def _validate_no_cycle(instance, parent):
-        # 自分自身や自分の子孫を親にすると循環参照になるため、親を辿って検査する
-        node = parent
-        while node is not None:
-            if node.pk == instance.pk:
-                raise serializers.ValidationError({"parent_category": "自分自身またはその子孫を親カテゴリに指定することはできません。"})
-            node = node.parent_category
