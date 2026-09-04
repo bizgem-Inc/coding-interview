@@ -1,10 +1,14 @@
 from types import SimpleNamespace
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 from rest_framework.exceptions import ValidationError
 
 from api.models import Category, Company
 from api.validators import NoCircularParentCategoryValidator, SameCompanyParentCategoryValidator
+
+
+# バリデータはモデルの pk / FK 属性しか参照しないため、未保存インスタンスで組み立てる。
+# SimpleTestCase は DB アクセスを禁止するので、バリデータが DB に依存しないことも同時に保証される。
 
 
 def serializer_for(instance=None):
@@ -12,13 +16,13 @@ def serializer_for(instance=None):
     return SimpleNamespace(instance=instance)
 
 
-class SameCompanyParentCategoryValidatorTests(TestCase):
+class SameCompanyParentCategoryValidatorTests(SimpleTestCase):
     def setUp(self):
         self.validator = SameCompanyParentCategoryValidator()
-        self.company = Company.objects.create(name="テスト企業")
-        self.other_company = Company.objects.create(name="別企業")
-        self.parent = Category.objects.create(company=self.company, name="食品")
-        self.other_parent = Category.objects.create(company=self.other_company, name="食品")
+        self.company = Company(name="テスト企業")
+        self.other_company = Company(name="別企業")
+        self.parent = Category(company=self.company, name="食品")
+        self.other_parent = Category(company=self.other_company, name="食品")
 
     def test_passes_without_parent(self):
         self.validator({"company": self.company, "name": "菓子"}, serializer_for())
@@ -33,7 +37,7 @@ class SameCompanyParentCategoryValidatorTests(TestCase):
         self.assertIn("parent_category", ctx.exception.detail)
 
     def test_falls_back_to_instance_company_on_partial_update(self):
-        child = Category.objects.create(company=self.company, name="菓子")
+        child = Category(company=self.company, name="菓子")
 
         # PATCH で parent_category だけを送った場合、company はインスタンスの値で判定される
         self.validator({"parent_category": self.parent}, serializer_for(child))
@@ -41,21 +45,21 @@ class SameCompanyParentCategoryValidatorTests(TestCase):
             self.validator({"parent_category": self.other_parent}, serializer_for(child))
 
     def test_falls_back_to_instance_parent_on_partial_update(self):
-        child = Category.objects.create(company=self.company, name="菓子", parent_category=self.parent)
+        child = Category(company=self.company, name="菓子", parent_category=self.parent)
 
         # PATCH で company だけを別企業に変えると、既存の親が別企業になるため拒否される
         with self.assertRaises(ValidationError):
             self.validator({"company": self.other_company}, serializer_for(child))
 
 
-class NoCircularParentCategoryValidatorTests(TestCase):
+class NoCircularParentCategoryValidatorTests(SimpleTestCase):
     def setUp(self):
         self.validator = NoCircularParentCategoryValidator()
-        company = Company.objects.create(name="テスト企業")
-        self.root = Category.objects.create(company=company, name="食品")
-        self.child = Category.objects.create(company=company, name="菓子", parent_category=self.root)
-        self.grandchild = Category.objects.create(company=company, name="チョコレート", parent_category=self.child)
-        self.sibling = Category.objects.create(company=company, name="飲料")
+        company = Company(name="テスト企業")
+        self.root = Category(company=company, name="食品")
+        self.child = Category(company=company, name="菓子", parent_category=self.root)
+        self.grandchild = Category(company=company, name="チョコレート", parent_category=self.child)
+        self.sibling = Category(company=company, name="飲料")
 
     def test_skips_on_create(self):
         # 新規作成時はまだ子孫を持たないため循環は成立しない
