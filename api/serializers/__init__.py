@@ -1,3 +1,3 @@
-from .category import CategorySerializer
+from .category import CategoryQuerySerializer, CategorySerializer
 
-__all__ = ["CategorySerializer"]
+__all__ = ["CategoryQuerySerializer", "CategorySerializer"]

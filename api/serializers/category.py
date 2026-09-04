@@ -20,3 +20,9 @@ class CategorySerializer(serializers.ModelSerializer):
             SameCompanyParentCategoryValidator(),
             NoCircularParentCategoryValidator(),
         ]
+
+
+class CategoryQuerySerializer(serializers.Serializer):
+    """一覧の絞り込みに使うクエリパラメータ。未検証のまま ORM に渡すと不正な UUID で 500 になるため検証する"""
+
+    company = serializers.UUIDField(required=False)

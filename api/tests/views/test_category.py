@@ -33,6 +33,12 @@ class CategoryViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual([item["id"] for item in response.json()], [str(self.other_category.id)])
 
+    def test_list_rejects_malformed_company_filter(self):
+        response = self.client.get(reverse("category-list"), {"company": "not-a-uuid"})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("company", response.json())
+
     # ---- retrieve ----
 
     def test_retrieve(self):
@@ -76,6 +82,36 @@ class CategoryViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(set(response.json()), {"company", "name"})
+
+    def test_create_rejects_malformed_company(self):
+        response = self.client.post(reverse("category-list"), {"company": "not-a-uuid", "name": "飲料"}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("company", response.json())
+
+    def test_create_rejects_nonexistent_company(self):
+        payload = {"company": "00000000-0000-0000-0000-000000000000", "name": "飲料"}
+
+        response = self.client.post(reverse("category-list"), payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("company", response.json())
+
+    def test_create_rejects_blank_name(self):
+        response = self.client.post(reverse("category-list"), {"company": self.company.id, "name": ""}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("name", response.json())
+
+    def test_create_name_length_boundary(self):
+        url = reverse("category-list")
+
+        accepted = self.client.post(url, {"company": self.company.id, "name": "a" * 255}, format="json")
+        rejected = self.client.post(url, {"company": self.company.id, "name": "b" * 256}, format="json")
+
+        self.assertEqual(accepted.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(rejected.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("name", rejected.json())
 
     def test_create_rejects_duplicate_name_within_company(self):
         response = self.client.post(reverse("category-list"), {"company": self.company.id, "name": "食品"}, format="json")
